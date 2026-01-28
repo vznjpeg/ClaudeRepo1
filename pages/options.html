@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusGuard — Options</title>
+  <style>
+    :root {
+      --font-stack: "Lucida Grande", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --aqua-blue: #2b6de8;
+      --aqua-blue-dark: #1a4fbb;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-stack);
+      font-size: 13px;
+      color: #1a1a1a;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.06) 1px, rgba(255,255,255,0.06) 2px),
+        linear-gradient(180deg, #e8e8e8 0%, #d4d4d4 4%, #c9c9c9 8%, #d2d2d2 20%, #c6c6c6 40%, #bcbcbc 60%, #c0c0c0 80%, #b8b8b8 100%);
+      min-height: 100vh;
+      padding: 30px;
+    }
+
+    .window {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid rgba(0,0,0,0.2);
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15),
+                  0 1px 0 rgba(255,255,255,0.6) inset;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .window-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px 10px;
+      background: linear-gradient(180deg, #e8edf3 0%, #c4ccd8 50%, #abb5c3 51%, #bcc6d4 100%);
+      border-bottom: 1px solid #7a8a9e;
+    }
+
+    .window-titlebar h1 {
+      font-size: 14px;
+      font-weight: bold;
+      color: #2c3e50;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+    }
+
+    .window-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section {
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .section-header {
+      font-size: 11px;
+      font-weight: bold;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .option-row:last-child { border-bottom: none; }
+
+    .option-label {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .option-desc {
+      font-size: 11px;
+      color: #777;
+      margin-top: 2px;
+    }
+
+    .aqua-btn {
+      font-family: var(--font-stack);
+      font-size: 12px;
+      font-weight: bold;
+      padding: 6px 18px;
+      border-radius: 5px;
+      border: 1px solid rgba(0,0,0,0.25);
+      cursor: pointer;
+      text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .aqua-btn::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.1));
+      border-radius: 4px 4px 0 0;
+      pointer-events: none;
+    }
+
+    .aqua-btn:active { transform: scale(0.97); }
+
+    .btn-red {
+      background: linear-gradient(180deg, #f77 0%, #d9534f 50%, #b52b27 100%);
+      border-color: #a02020;
+    }
+
+    .btn-blue {
+      background: linear-gradient(180deg, #6aaef7 0%, #2b6de8 50%, #1a4fbb 100%);
+      border-color: #1a4fbb;
+    }
+
+    .btn-graphite {
+      background: linear-gradient(180deg, #a8aeb5 0%, #7a7f85 50%, #555a5f 100%);
+      border-color: #444;
+    }
+
+    .export-area {
+      width: 100%;
+      min-height: 80px;
+      font-family: "Monaco", "Menlo", monospace;
+      font-size: 11px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #aaa;
+      background: linear-gradient(180deg, #f0f0f0 0%, #fff 6px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1) inset;
+      resize: vertical;
+      margin-top: 8px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .status-msg {
+      font-size: 11px;
+      color: #4caf50;
+      margin-top: 6px;
+      min-height: 16px;
+    }
+
+    .about {
+      text-align: center;
+      color: #888;
+      font-size: 11px;
+      padding: 10px;
+    }
+
+    .about strong {
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <div class="window-titlebar">
+      <h1>FocusGuard Options</h1>
+    </div>
+    <div class="window-body">
+
+      <div class="section">
+        <div class="section-header">Data Management</div>
+        <div class="option-row">
+          <div>
+            <div class="option-label">Export Block List</div>
+            <div class="option-desc">Copy your blocked domains as JSON for backup.</div>
+          </div>
+          <button class="aqua-btn btn-blue" id="exportBtn">Export</button>
+        </div>
+        <textarea class="export-area hidden" id="exportArea" readonly></textarea>
+
+        <div class="option-row">
+          <div>
+            <div class="option-label">Import Block List</div>
+            <div class="option-desc">Paste a JSON array of domains to import.</div>
+          </div>
+          <button class="aqua-btn btn-blue" id="importBtn">Import</button>
+        </div>
+        <textarea class="export-area hidden" id="importArea" placeholder='["example.com", "another.com"]'></textarea>
+        <div class="status-msg" id="importStatus"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-header">Reset</div>
+        <div class="option-row">
+          <div>
+            <div class="option-label">Reset Statistics</div>
+            <div class="option-desc">Clear all tracked stats. Block list is kept.</div>
+          </div>
+          <button class="aqua-btn btn-graphite" id="resetStatsBtn">Reset Stats</button>
+        </div>
+        <div class="option-row">
+          <div>
+            <div class="option-label">Reset Everything</div>
+            <div class="option-desc">Remove all blocked sites, categories, and stats.</div>
+          </div>
+          <button class="aqua-btn btn-red" id="resetAllBtn">Reset All</button>
+        </div>
+      </div>
+
+      <div class="about">
+        <strong>FocusGuard</strong> v1.0.0 &mdash; Stay focused, stay sharp.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function sendMsg(msg) {
+      return chrome.runtime.sendMessage(msg);
+    }
+
+    // Export
+    document.getElementById("exportBtn").addEventListener("click", async () => {
+      const area = document.getElementById("exportArea");
+      area.classList.toggle("hidden");
+      if (!area.classList.contains("hidden")) {
+        const res = await sendMsg({ type: "GET_STATE" });
+        area.value = JSON.stringify(res.state.blockedDomains, null, 2);
+        area.select();
+      }
+    });
+
+    // Import
+    document.getElementById("importBtn").addEventListener("click", async () => {
+      const area = document.getElementById("importArea");
+      const status = document.getElementById("importStatus");
+      area.classList.toggle("hidden");
+
+      if (!area.classList.contains("hidden") && area.value.trim()) {
+        try {
+          const domains = JSON.parse(area.value.trim());
+          if (!Array.isArray(domains)) throw new Error("Must be an array");
+          for (const d of domains) {
+            await sendMsg({ type: "ADD_DOMAIN", domain: d });
+          }
+          status.textContent = `Imported ${domains.length} domain(s).`;
+          area.value = "";
+        } catch (e) {
+          status.textContent = "Error: " + e.message;
+          status.style.color = "#d9534f";
+        }
+      }
+    });
+
+    // Reset stats
+    document.getElementById("resetStatsBtn").addEventListener("click", async () => {
+      if (confirm("Reset all statistics? This cannot be undone.")) {
+        await sendMsg({ type: "RESET_STATS" });
+        alert("Statistics reset.");
+      }
+    });
+
+    // Reset all
+    document.getElementById("resetAllBtn").addEventListener("click", async () => {
+      if (confirm("Remove ALL data? This will clear your block list, categories, and stats.")) {
+        await chrome.storage.local.clear();
+        alert("All data cleared. Reloading...");
+        location.reload();
+      }
+    });
+  </script>
+</body>
+</html>

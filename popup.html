@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusGuard</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Title Bar -->
+    <div class="titlebar">
+      <div class="titlebar-icon">
+        <div class="shield-icon"></div>
+      </div>
+      <span class="titlebar-text">FocusGuard</span>
+      <div class="titlebar-badge" id="blockedCount" title="Sites blocked today">0</div>
+    </div>
+
+    <!-- Master Toggle -->
+    <div class="panel master-toggle-panel">
+      <div class="toggle-row">
+        <span class="toggle-label">Protection Active</span>
+        <label class="aqua-toggle">
+          <input type="checkbox" id="masterToggle" checked>
+          <span class="toggle-track">
+            <span class="toggle-thumb"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <button class="tab active" data-tab="block">Block</button>
+      <button class="tab" data-tab="focus">Focus</button>
+      <button class="tab" data-tab="stats">Stats</button>
+    </div>
+
+    <!-- Block Tab -->
+    <div class="tab-content active" id="tab-block">
+      <!-- Add Domain -->
+      <div class="panel">
+        <div class="panel-header">Add Website</div>
+        <div class="input-row">
+          <input type="text" id="domainInput" class="aqua-input" placeholder="example.com">
+          <button id="addDomainBtn" class="aqua-btn aqua-btn-blue">Add</button>
+        </div>
+      </div>
+
+      <!-- Custom Blocked Sites -->
+      <div class="panel">
+        <div class="panel-header">Blocked Sites</div>
+        <div id="blockedList" class="blocked-list">
+          <div class="empty-state">No sites blocked yet.</div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="panel">
+        <div class="panel-header">Quick Categories</div>
+        <div id="categoryList" class="category-list"></div>
+      </div>
+    </div>
+
+    <!-- Focus Tab -->
+    <div class="tab-content" id="tab-focus">
+      <div class="panel focus-panel" id="focusIdle">
+        <div class="panel-header">Focus Session</div>
+        <p class="panel-desc">Start a timed focus session. Blocking will stay active for the duration.</p>
+        <div class="focus-presets">
+          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="25">25 min</button>
+          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="45">45 min</button>
+          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="60">60 min</button>
+          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="120">2 hrs</button>
+        </div>
+        <div class="custom-focus-row">
+          <input type="number" id="customMinutes" class="aqua-input" placeholder="Custom (min)" min="1" max="480">
+          <button id="startCustomFocus" class="aqua-btn aqua-btn-blue">Start</button>
+        </div>
+      </div>
+
+      <div class="panel focus-panel hidden" id="focusActive">
+        <div class="panel-header">Focus Active</div>
+        <div class="focus-timer-display">
+          <div class="timer-ring">
+            <svg viewBox="0 0 120 120" class="timer-svg">
+              <circle cx="60" cy="60" r="52" class="timer-bg" />
+              <circle cx="60" cy="60" r="52" class="timer-fg" id="timerCircle" />
+            </svg>
+            <div class="timer-text" id="timerText">00:00</div>
+          </div>
+        </div>
+        <button id="cancelFocusBtn" class="aqua-btn aqua-btn-red">End Session</button>
+      </div>
+    </div>
+
+    <!-- Stats Tab -->
+    <div class="tab-content" id="tab-stats">
+      <div class="panel">
+        <div class="panel-header">Your Progress</div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statBlockedToday">0</div>
+            <div class="stat-label">Blocked Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statTotalBlocked">0</div>
+            <div class="stat-label">Total Blocked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statSessions">0</div>
+            <div class="stat-label">Sessions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statFocusTime">0h</div>
+            <div class="stat-label">Focus Time</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">Schedule</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Auto-block on Schedule</span>
+          <label class="aqua-toggle">
+            <input type="checkbox" id="scheduleToggle">
+            <span class="toggle-track">
+              <span class="toggle-thumb"></span>
+            </span>
+          </label>
+        </div>
+        <div id="scheduleOptions" class="schedule-options hidden">
+          <div class="schedule-days" id="scheduleDays"></div>
+          <div class="schedule-time-row">
+            <label>From <input type="number" id="schedStartHour" class="aqua-input time-input" min="0" max="23" value="9">:00</label>
+            <label>To <input type="number" id="schedEndHour" class="aqua-input time-input" min="0" max="23" value="17">:00</label>
+          </div>
+        </div>
+      </div>
+
+      <button id="settingsBtn" class="aqua-btn aqua-btn-graphite full-width-btn">Options & Settings</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
