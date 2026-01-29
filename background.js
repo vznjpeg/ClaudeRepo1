@@ -1,327 +1,269 @@
-// FocusGuard — Background Service Worker
-// Handles blocking rules, focus sessions, and statistics tracking.
+// Reverse Image Prompt — Background Service Worker
 
-const PRESET_CATEGORIES = {
-  social: {
-    name: "Social Media",
-    icon: "social",
-    domains: [
-      "facebook.com", "www.facebook.com",
-      "twitter.com", "www.twitter.com", "x.com", "www.x.com",
-      "instagram.com", "www.instagram.com",
-      "tiktok.com", "www.tiktok.com",
-      "snapchat.com", "www.snapchat.com",
-      "reddit.com", "www.reddit.com",
-      "linkedin.com", "www.linkedin.com",
-      "threads.net", "www.threads.net",
-      "mastodon.social"
-    ]
-  },
-  video: {
-    name: "Video & Streaming",
-    icon: "video",
-    domains: [
-      "youtube.com", "www.youtube.com",
-      "netflix.com", "www.netflix.com",
-      "twitch.tv", "www.twitch.tv",
-      "hulu.com", "www.hulu.com",
-      "disneyplus.com", "www.disneyplus.com",
-      "dailymotion.com", "www.dailymotion.com"
-    ]
-  },
-  news: {
-    name: "News & Media",
-    icon: "news",
-    domains: [
-      "news.ycombinator.com",
-      "cnn.com", "www.cnn.com",
-      "bbc.com", "www.bbc.com",
-      "foxnews.com", "www.foxnews.com",
-      "nytimes.com", "www.nytimes.com",
-      "theguardian.com", "www.theguardian.com",
-      "buzzfeed.com", "www.buzzfeed.com"
-    ]
-  },
-  gaming: {
-    name: "Gaming",
-    icon: "gaming",
-    domains: [
-      "store.steampowered.com", "steampowered.com",
-      "epicgames.com", "www.epicgames.com",
-      "roblox.com", "www.roblox.com",
-      "minecraft.net", "www.minecraft.net",
-      "itch.io"
-    ]
-  },
-  shopping: {
-    name: "Shopping",
-    icon: "shopping",
-    domains: [
-      "amazon.com", "www.amazon.com",
-      "ebay.com", "www.ebay.com",
-      "etsy.com", "www.etsy.com",
-      "aliexpress.com", "www.aliexpress.com",
-      "wish.com", "www.wish.com"
-    ]
-  }
-};
+// Create context menu on install
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: 'reverse-image-prompt',
+    title: 'Reverse Image Prompt',
+    contexts: ['image']
+  });
+});
 
-// Default state
-const DEFAULT_STATE = {
-  enabled: true,
-  blockedDomains: [],
-  enabledCategories: [],
-  focusSession: null, // { endTime: timestamp, duration: minutes }
-  stats: {
-    totalBlocked: 0,
-    blockedToday: 0,
-    lastResetDate: new Date().toDateString(),
-    sessionsCompleted: 0,
-    totalFocusMinutes: 0
-  },
-  schedule: {
-    enabled: false,
-    days: [1, 2, 3, 4, 5], // Mon-Fri
-    startHour: 9,
-    endHour: 17
-  }
-};
+// Handle context menu click
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== 'reverse-image-prompt') return;
 
-// ── State Management ──
+  const imageUrl = info.srcUrl;
+  if (!imageUrl) return;
 
-async function getState() {
-  const result = await chrome.storage.local.get("focusGuardState");
-  return result.focusGuardState || { ...DEFAULT_STATE };
-}
+  // Store the image URL and set loading state
+  await chrome.storage.local.set({
+    currentImage: imageUrl,
+    promptResult: null,
+    isLoading: true,
+    error: null
+  });
 
-async function setState(state) {
-  await chrome.storage.local.set({ focusGuardState: state });
-}
-
-// ── Blocking Rules ──
-
-function getAllBlockedDomains(state) {
-  let domains = [...state.blockedDomains];
-  for (const catKey of state.enabledCategories) {
-    if (PRESET_CATEGORIES[catKey]) {
-      domains = domains.concat(PRESET_CATEGORIES[catKey].domains);
-    }
-  }
-  return [...new Set(domains)];
-}
-
-async function updateBlockingRules(state) {
-  // Remove all existing dynamic rules
-  const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
-  const removeIds = existingRules.map(r => r.id);
-
-  if (!state.enabled) {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: removeIds,
-      addRules: []
+  // Send message to content script to show the panel
+  try {
+    await chrome.tabs.sendMessage(tab.id, {
+      action: 'showPanel',
+      imageUrl: imageUrl
     });
-    return;
-  }
-
-  // Check schedule
-  if (state.schedule.enabled && !isWithinSchedule(state.schedule)) {
-    await chrome.declarativeNetRequest.updateDynamicRules({
-      removeRuleIds: removeIds,
-      addRules: []
+  } catch {
+    // Content script may not be injected yet, inject it
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['content.js']
     });
-    return;
+    // Retry after injection
+    setTimeout(async () => {
+      await chrome.tabs.sendMessage(tab.id, {
+        action: 'showPanel',
+        imageUrl: imageUrl
+      });
+    }, 200);
   }
 
-  const domains = getAllBlockedDomains(state);
-  const blockedPageUrl = chrome.runtime.getURL("pages/blocked.html");
+  // Process the image
+  processImage(imageUrl, tab.id);
+});
 
-  const addRules = domains.map((domain, idx) => ({
-    id: idx + 1,
-    priority: 1,
-    action: {
-      type: "redirect",
-      redirect: {
-        url: blockedPageUrl + "?domain=" + encodeURIComponent(domain)
-      }
-    },
-    condition: {
-      urlFilter: `||${domain}`,
-      resourceTypes: ["main_frame"]
-    }
-  }));
-
-  await chrome.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: removeIds,
-    addRules: addRules
+// Convert image URL to base64
+async function fetchImageAsBase64(url) {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
   });
 }
 
-function isWithinSchedule(schedule) {
-  const now = new Date();
-  const day = now.getDay(); // 0=Sun
-  const hour = now.getHours();
-  return schedule.days.includes(day) &&
-    hour >= schedule.startHour &&
-    hour < schedule.endHour;
-}
+// Process image with configured AI provider
+async function processImage(imageUrl, tabId) {
+  try {
+    const settings = await chrome.storage.sync.get({
+      provider: 'openai',
+      apiKey: '',
+      model: ''
+    });
 
-// ── Focus Session ──
-
-async function startFocusSession(minutes) {
-  const state = await getState();
-  const endTime = Date.now() + minutes * 60 * 1000;
-  state.focusSession = { endTime, duration: minutes };
-  state.enabled = true;
-  await setState(state);
-  await updateBlockingRules(state);
-
-  chrome.alarms.create("focusSessionEnd", { when: endTime });
-  chrome.alarms.create("focusSessionTick", { periodInMinutes: 1 / 60 }); // every second-ish for UI
-}
-
-async function endFocusSession() {
-  const state = await getState();
-  if (state.focusSession) {
-    state.stats.sessionsCompleted++;
-    state.stats.totalFocusMinutes += state.focusSession.duration;
-    state.focusSession = null;
-    await setState(state);
-  }
-  chrome.alarms.clear("focusSessionEnd");
-  chrome.alarms.clear("focusSessionTick");
-}
-
-async function cancelFocusSession() {
-  const state = await getState();
-  state.focusSession = null;
-  await setState(state);
-  chrome.alarms.clear("focusSessionEnd");
-  chrome.alarms.clear("focusSessionTick");
-}
-
-// ── Stats ──
-
-async function recordBlock() {
-  const state = await getState();
-  const today = new Date().toDateString();
-  if (state.stats.lastResetDate !== today) {
-    state.stats.blockedToday = 0;
-    state.stats.lastResetDate = today;
-  }
-  state.stats.totalBlocked++;
-  state.stats.blockedToday++;
-  await setState(state);
-}
-
-// ── Alarm Listener ──
-
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name === "focusSessionEnd") {
-    await endFocusSession();
-    // Optionally notify
-    // chrome.notifications would need permission
-  }
-});
-
-// ── Message Listener ──
-
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  handleMessage(msg).then(sendResponse);
-  return true; // async
-});
-
-async function handleMessage(msg) {
-  switch (msg.type) {
-    case "GET_STATE": {
-      const state = await getState();
-      return { state, categories: PRESET_CATEGORIES };
+    if (!settings.apiKey) {
+      const error = 'No API key configured. Right-click the extension icon → Options to add your API key.';
+      await chrome.storage.local.set({ isLoading: false, error });
+      chrome.tabs.sendMessage(tabId, { action: 'error', message: error });
+      return;
     }
 
-    case "SET_ENABLED": {
-      const state = await getState();
-      state.enabled = msg.enabled;
-      await setState(state);
-      await updateBlockingRules(state);
-      return { ok: true };
+    // Fetch image as base64
+    const base64Data = await fetchImageAsBase64(imageUrl);
+
+    let result;
+    if (settings.provider === 'openai') {
+      result = await callOpenAI(settings.apiKey, settings.model || 'gpt-4o', base64Data);
+    } else if (settings.provider === 'google') {
+      result = await callGemini(settings.apiKey, settings.model || 'gemini-2.0-flash', base64Data);
+    } else if (settings.provider === 'anthropic') {
+      result = await callAnthropic(settings.apiKey, settings.model || 'claude-sonnet-4-20250514', base64Data);
     }
 
-    case "ADD_DOMAIN": {
-      const state = await getState();
-      const domain = msg.domain.replace(/^(https?:\/\/)?(www\.)?/, "").replace(/\/.*$/, "");
-      if (!state.blockedDomains.includes(domain)) {
-        state.blockedDomains.push(domain);
-        await setState(state);
-        await updateBlockingRules(state);
+    await chrome.storage.local.set({
+      promptResult: result,
+      isLoading: false,
+      error: null
+    });
+
+    chrome.tabs.sendMessage(tabId, {
+      action: 'result',
+      prompt: result
+    });
+
+  } catch (err) {
+    const error = `Error: ${err.message}`;
+    await chrome.storage.local.set({ isLoading: false, error });
+    chrome.tabs.sendMessage(tabId, { action: 'error', message: error });
+  }
+}
+
+// System prompt for all providers
+const SYSTEM_PROMPT = `You are an expert at reverse-engineering AI image generation prompts. Given an image, analyze it carefully and produce a detailed text prompt that could be used to recreate this image with an AI image generator like Midjourney, DALL-E, or Stable Diffusion.
+
+Your output should be ONLY the prompt text — no explanations, no preamble, no labels. Just the prompt itself.
+
+Consider these aspects:
+- Subject matter and composition
+- Art style (photorealistic, digital art, oil painting, watercolor, anime, etc.)
+- Lighting and color palette
+- Camera angle and perspective
+- Mood and atmosphere
+- Level of detail and textures
+- Any text or typography visible
+- Background and environment
+- Notable artistic techniques or effects`;
+
+// OpenAI API call
+async function callOpenAI(apiKey, model, base64Data) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [
+        {
+          role: 'system',
+          content: SYSTEM_PROMPT
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: 'Reverse-engineer a detailed AI image generation prompt for this image.'
+            },
+            {
+              type: 'image_url',
+              image_url: { url: base64Data }
+            }
+          ]
+        }
+      ],
+      max_tokens: 1000
+    })
+  });
+
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.choices[0].message.content.trim();
+}
+
+// Google Gemini API call
+async function callGemini(apiKey, model, base64Data) {
+  const match = base64Data.match(/^data:(.*?);base64,(.*)$/);
+  if (!match) throw new Error('Failed to process image data');
+  const mimeType = match[1];
+  const rawBase64 = match[2];
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: {
+          parts: [{ text: SYSTEM_PROMPT }]
+        },
+        contents: [
+          {
+            parts: [
+              { text: 'Reverse-engineer a detailed AI image generation prompt for this image.' },
+              {
+                inline_data: {
+                  mime_type: mimeType,
+                  data: rawBase64
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          maxOutputTokens: 1000
+        }
+      })
+    }
+  );
+
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.candidates[0].content.parts[0].text.trim();
+}
+
+// Anthropic API call
+async function callAnthropic(apiKey, model, base64Data) {
+  const match = base64Data.match(/^data:(.*?);base64,(.*)$/);
+  if (!match) throw new Error('Failed to process image data');
+  const mediaType = match[1];
+  const rawBase64 = match[2];
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: model,
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mediaType,
+                data: rawBase64
+              }
+            },
+            {
+              type: 'text',
+              text: 'Reverse-engineer a detailed AI image generation prompt for this image.'
+            }
+          ]
+        }
+      ]
+    })
+  });
+
+  const data = await response.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content[0].text.trim();
+}
+
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'getState') {
+    chrome.storage.local.get(['currentImage', 'promptResult', 'isLoading', 'error'], (data) => {
+      sendResponse(data);
+    });
+    return true;
+  }
+
+  if (message.action === 'retryProcess') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        processImage(message.imageUrl, tabs[0].id);
       }
-      return { ok: true };
-    }
-
-    case "REMOVE_DOMAIN": {
-      const state = await getState();
-      state.blockedDomains = state.blockedDomains.filter(d => d !== msg.domain);
-      await setState(state);
-      await updateBlockingRules(state);
-      return { ok: true };
-    }
-
-    case "TOGGLE_CATEGORY": {
-      const state = await getState();
-      const idx = state.enabledCategories.indexOf(msg.category);
-      if (idx >= 0) {
-        state.enabledCategories.splice(idx, 1);
-      } else {
-        state.enabledCategories.push(msg.category);
-      }
-      await setState(state);
-      await updateBlockingRules(state);
-      return { ok: true };
-    }
-
-    case "START_FOCUS": {
-      await startFocusSession(msg.minutes);
-      return { ok: true };
-    }
-
-    case "CANCEL_FOCUS": {
-      await cancelFocusSession();
-      return { ok: true };
-    }
-
-    case "RECORD_BLOCK": {
-      await recordBlock();
-      return { ok: true };
-    }
-
-    case "UPDATE_SCHEDULE": {
-      const state = await getState();
-      state.schedule = { ...state.schedule, ...msg.schedule };
-      await setState(state);
-      await updateBlockingRules(state);
-      return { ok: true };
-    }
-
-    case "RESET_STATS": {
-      const state = await getState();
-      state.stats = { ...DEFAULT_STATE.stats };
-      await setState(state);
-      return { ok: true };
-    }
-
-    default:
-      return { error: "Unknown message type" };
+    });
+    sendResponse({ ok: true });
+    return true;
   }
-}
-
-// ── On Install ──
-
-chrome.runtime.onInstalled.addListener(async () => {
-  const state = await getState();
-  await setState({ ...DEFAULT_STATE, ...state });
-  await updateBlockingRules(state);
-});
-
-// ── Track blocked navigations for stats ──
-
-chrome.declarativeNetRequest.onRuleMatchedDebug?.addListener?.((info) => {
-  recordBlock();
 });

@@ -3,285 +3,333 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FocusGuard — Options</title>
+  <title>Reverse Image Prompt — Settings</title>
   <style>
     :root {
-      --font-stack: "Lucida Grande", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-      --aqua-blue: #2b6de8;
-      --aqua-blue-dark: #1a4fbb;
+      --bg: #1a1a2e;
+      --bg-card: #16162a;
+      --bg-input: #0d0d1a;
+      --text: #e0e0f0;
+      --text-dim: #8b8ba3;
+      --accent: #7c3aed;
+      --accent-blue: #2563eb;
+      --border: rgba(255, 255, 255, 0.08);
+      --error: #f87171;
+      --success: #34d399;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: var(--font-stack);
-      font-size: 13px;
-      color: #1a1a1a;
-      background:
-        repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.06) 1px, rgba(255,255,255,0.06) 2px),
-        linear-gradient(180deg, #e8e8e8 0%, #d4d4d4 4%, #c9c9c9 8%, #d2d2d2 20%, #c6c6c6 40%, #bcbcbc 60%, #c0c0c0 80%, #b8b8b8 100%);
-      min-height: 100vh;
-      padding: 30px;
-    }
-
-    .window {
-      max-width: 600px;
-      margin: 0 auto;
-      background: rgba(255,255,255,0.8);
-      border: 1px solid rgba(0,0,0,0.2);
-      border-radius: 10px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15),
-                  0 1px 0 rgba(255,255,255,0.6) inset;
-      backdrop-filter: blur(10px);
-      overflow: hidden;
-    }
-
-    .window-titlebar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px 10px;
-      background: linear-gradient(180deg, #e8edf3 0%, #c4ccd8 50%, #abb5c3 51%, #bcc6d4 100%);
-      border-bottom: 1px solid #7a8a9e;
-    }
-
-    .window-titlebar h1 {
+      font-family: var(--font);
       font-size: 14px;
-      font-weight: bold;
-      color: #2c3e50;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      padding: 40px 20px;
     }
 
-    .window-body {
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
     }
 
-    .section {
-      background: rgba(255,255,255,0.6);
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 8px;
-      padding: 16px;
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
     }
 
-    .section-header {
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      color: var(--text-dim);
+      font-size: 13px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
       font-size: 11px;
-      font-weight: bold;
-      color: #555;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 16px;
     }
 
-    .option-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+    .field {
+      margin-bottom: 16px;
     }
 
-    .option-row:last-child { border-bottom: none; }
+    .field:last-child {
+      margin-bottom: 0;
+    }
 
-    .option-label {
+    .field label {
+      display: block;
       font-size: 13px;
       font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
     }
 
-    .option-desc {
+    .field .hint {
       font-size: 11px;
-      color: #777;
-      margin-top: 2px;
+      color: var(--text-dim);
+      margin-top: 4px;
     }
 
-    .aqua-btn {
-      font-family: var(--font-stack);
-      font-size: 12px;
-      font-weight: bold;
-      padding: 6px 18px;
-      border-radius: 5px;
-      border: 1px solid rgba(0,0,0,0.25);
-      cursor: pointer;
-      text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
-      color: #fff;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .aqua-btn::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.1));
-      border-radius: 4px 4px 0 0;
-      pointer-events: none;
-    }
-
-    .aqua-btn:active { transform: scale(0.97); }
-
-    .btn-red {
-      background: linear-gradient(180deg, #f77 0%, #d9534f 50%, #b52b27 100%);
-      border-color: #a02020;
-    }
-
-    .btn-blue {
-      background: linear-gradient(180deg, #6aaef7 0%, #2b6de8 50%, #1a4fbb 100%);
-      border-color: #1a4fbb;
-    }
-
-    .btn-graphite {
-      background: linear-gradient(180deg, #a8aeb5 0%, #7a7f85 50%, #555a5f 100%);
-      border-color: #444;
-    }
-
-    .export-area {
+    select, input[type="text"], input[type="password"] {
       width: 100%;
-      min-height: 80px;
-      font-family: "Monaco", "Menlo", monospace;
-      font-size: 11px;
-      padding: 8px;
-      border-radius: 4px;
-      border: 1px solid #aaa;
-      background: linear-gradient(180deg, #f0f0f0 0%, #fff 6px);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1) inset;
-      resize: vertical;
-      margin-top: 8px;
+      padding: 10px 12px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--accent);
+    }
+
+    select option {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .api-key-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .api-key-row input {
+      flex: 1;
+    }
+
+    .toggle-vis {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      padding: 0 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: var(--font);
+      transition: background 0.15s;
+    }
+
+    .toggle-vis:hover {
+      background: rgba(255, 255, 255, 0.14);
     }
 
     .btn-row {
       display: flex;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 10px;
     }
 
-    .status-msg {
-      font-size: 11px;
-      color: #4caf50;
-      margin-top: 6px;
-      min-height: 16px;
+    .btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
     }
 
-    .about {
+    .btn-save {
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+      color: #fff;
+    }
+
+    .btn-save:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-reset {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-dim);
+    }
+
+    .btn-reset:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .status {
       text-align: center;
-      color: #888;
-      font-size: 11px;
-      padding: 10px;
+      font-size: 13px;
+      margin-top: 12px;
+      min-height: 20px;
     }
 
-    .about strong {
-      color: #555;
+    .status.success { color: var(--success); }
+    .status.error { color: var(--error); }
+
+    .models-info {
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .models-info h4 {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .models-info ul {
+      list-style: none;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .models-info li {
+      padding: 2px 0;
+    }
+
+    .models-info code {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+      margin-top: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="window">
-    <div class="window-titlebar">
-      <h1>FocusGuard Options</h1>
+  <div class="container">
+    <div class="header">
+      <h1>Reverse Image Prompt</h1>
+      <p>Configure your AI provider to start reverse-engineering image prompts.</p>
     </div>
-    <div class="window-body">
 
-      <div class="section">
-        <div class="section-header">Data Management</div>
-        <div class="option-row">
-          <div>
-            <div class="option-label">Export Block List</div>
-            <div class="option-desc">Copy your blocked domains as JSON for backup.</div>
-          </div>
-          <button class="aqua-btn btn-blue" id="exportBtn">Export</button>
-        </div>
-        <textarea class="export-area hidden" id="exportArea" readonly></textarea>
-
-        <div class="option-row">
-          <div>
-            <div class="option-label">Import Block List</div>
-            <div class="option-desc">Paste a JSON array of domains to import.</div>
-          </div>
-          <button class="aqua-btn btn-blue" id="importBtn">Import</button>
-        </div>
-        <textarea class="export-area hidden" id="importArea" placeholder='["example.com", "another.com"]'></textarea>
-        <div class="status-msg" id="importStatus"></div>
+    <div class="card">
+      <div class="card-title">AI Provider</div>
+      <div class="field">
+        <label for="provider">Provider</label>
+        <select id="provider">
+          <option value="openai">OpenAI (GPT-4o)</option>
+          <option value="google">Google Gemini</option>
+          <option value="anthropic">Anthropic Claude</option>
+        </select>
       </div>
-
-      <div class="section">
-        <div class="section-header">Reset</div>
-        <div class="option-row">
-          <div>
-            <div class="option-label">Reset Statistics</div>
-            <div class="option-desc">Clear all tracked stats. Block list is kept.</div>
-          </div>
-          <button class="aqua-btn btn-graphite" id="resetStatsBtn">Reset Stats</button>
+      <div class="field">
+        <label for="apiKey">API Key</label>
+        <div class="api-key-row">
+          <input type="password" id="apiKey" placeholder="Enter your API key" autocomplete="off" />
+          <button class="toggle-vis" id="toggleVis">Show</button>
         </div>
-        <div class="option-row">
-          <div>
-            <div class="option-label">Reset Everything</div>
-            <div class="option-desc">Remove all blocked sites, categories, and stats.</div>
-          </div>
-          <button class="aqua-btn btn-red" id="resetAllBtn">Reset All</button>
-        </div>
+        <div class="hint">Your key is stored locally in Chrome and never sent anywhere except the selected provider.</div>
       </div>
+      <div class="field">
+        <label for="model">Model (optional)</label>
+        <input type="text" id="model" placeholder="Leave empty for default" />
+        <div class="hint">Override the default model. Leave blank to use the recommended default.</div>
+      </div>
+    </div>
 
-      <div class="about">
-        <strong>FocusGuard</strong> v1.0.0 &mdash; Stay focused, stay sharp.
-      </div>
+    <div class="card models-info">
+      <h4>Default Models by Provider</h4>
+      <ul>
+        <li>OpenAI: <code>gpt-4o</code></li>
+        <li>Google Gemini: <code>gemini-2.0-flash</code></li>
+        <li>Anthropic: <code>claude-sonnet-4-20250514</code></li>
+      </ul>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-save" id="saveBtn">Save Settings</button>
+      <button class="btn btn-reset" id="resetBtn">Reset</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+      Reverse Image Prompt v1.0.0
     </div>
   </div>
 
   <script>
-    async function sendMsg(msg) {
-      return chrome.runtime.sendMessage(msg);
-    }
+    const providerEl = document.getElementById('provider');
+    const apiKeyEl = document.getElementById('apiKey');
+    const modelEl = document.getElementById('model');
+    const statusEl = document.getElementById('status');
+    const toggleVisBtn = document.getElementById('toggleVis');
 
-    // Export
-    document.getElementById("exportBtn").addEventListener("click", async () => {
-      const area = document.getElementById("exportArea");
-      area.classList.toggle("hidden");
-      if (!area.classList.contains("hidden")) {
-        const res = await sendMsg({ type: "GET_STATE" });
-        area.value = JSON.stringify(res.state.blockedDomains, null, 2);
-        area.select();
-      }
+    // Load saved settings
+    chrome.storage.sync.get({ provider: 'openai', apiKey: '', model: '' }, (data) => {
+      providerEl.value = data.provider;
+      apiKeyEl.value = data.apiKey;
+      modelEl.value = data.model;
     });
 
-    // Import
-    document.getElementById("importBtn").addEventListener("click", async () => {
-      const area = document.getElementById("importArea");
-      const status = document.getElementById("importStatus");
-      area.classList.toggle("hidden");
-
-      if (!area.classList.contains("hidden") && area.value.trim()) {
-        try {
-          const domains = JSON.parse(area.value.trim());
-          if (!Array.isArray(domains)) throw new Error("Must be an array");
-          for (const d of domains) {
-            await sendMsg({ type: "ADD_DOMAIN", domain: d });
-          }
-          status.textContent = `Imported ${domains.length} domain(s).`;
-          area.value = "";
-        } catch (e) {
-          status.textContent = "Error: " + e.message;
-          status.style.color = "#d9534f";
-        }
-      }
+    // Toggle API key visibility
+    toggleVisBtn.addEventListener('click', () => {
+      const isPassword = apiKeyEl.type === 'password';
+      apiKeyEl.type = isPassword ? 'text' : 'password';
+      toggleVisBtn.textContent = isPassword ? 'Hide' : 'Show';
     });
 
-    // Reset stats
-    document.getElementById("resetStatsBtn").addEventListener("click", async () => {
-      if (confirm("Reset all statistics? This cannot be undone.")) {
-        await sendMsg({ type: "RESET_STATS" });
-        alert("Statistics reset.");
+    // Save
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const provider = providerEl.value;
+      const apiKey = apiKeyEl.value.trim();
+      const model = modelEl.value.trim();
+
+      if (!apiKey) {
+        statusEl.textContent = 'Please enter an API key.';
+        statusEl.className = 'status error';
+        return;
       }
+
+      chrome.storage.sync.set({ provider, apiKey, model }, () => {
+        statusEl.textContent = 'Settings saved successfully.';
+        statusEl.className = 'status success';
+        setTimeout(() => { statusEl.textContent = ''; }, 3000);
+      });
     });
 
-    // Reset all
-    document.getElementById("resetAllBtn").addEventListener("click", async () => {
-      if (confirm("Remove ALL data? This will clear your block list, categories, and stats.")) {
-        await chrome.storage.local.clear();
-        alert("All data cleared. Reloading...");
-        location.reload();
+    // Reset
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('Reset all settings? This will remove your API key.')) {
+        chrome.storage.sync.clear(() => {
+          providerEl.value = 'openai';
+          apiKeyEl.value = '';
+          modelEl.value = '';
+          statusEl.textContent = 'Settings reset.';
+          statusEl.className = 'status success';
+          setTimeout(() => { statusEl.textContent = ''; }, 3000);
+        });
       }
     });
   </script>

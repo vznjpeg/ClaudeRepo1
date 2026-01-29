@@ -3,143 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FocusGuard</title>
+  <title>Reverse Image Prompt</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div id="app">
-    <!-- Title Bar -->
-    <div class="titlebar">
-      <div class="titlebar-icon">
-        <div class="shield-icon"></div>
+    <div class="header">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="12" height="10" rx="2"/>
+          <path d="M15 8 Q19 5 19 11 Q19 17 13 18"/>
+          <polygon points="13,15 10,19 14,20"/>
+        </svg>
       </div>
-      <span class="titlebar-text">FocusGuard</span>
-      <div class="titlebar-badge" id="blockedCount" title="Sites blocked today">0</div>
+      <span class="header-title">Reverse Image Prompt</span>
+      <button id="settingsBtn" class="header-settings" title="Settings">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
     </div>
 
-    <!-- Master Toggle -->
-    <div class="panel master-toggle-panel">
-      <div class="toggle-row">
-        <span class="toggle-label">Protection Active</span>
-        <label class="aqua-toggle">
-          <input type="checkbox" id="masterToggle" checked>
-          <span class="toggle-track">
-            <span class="toggle-thumb"></span>
-          </span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Tab Bar -->
-    <div class="tab-bar">
-      <button class="tab active" data-tab="block">Block</button>
-      <button class="tab" data-tab="focus">Focus</button>
-      <button class="tab" data-tab="stats">Stats</button>
-    </div>
-
-    <!-- Block Tab -->
-    <div class="tab-content active" id="tab-block">
-      <!-- Add Domain -->
-      <div class="panel">
-        <div class="panel-header">Add Website</div>
-        <div class="input-row">
-          <input type="text" id="domainInput" class="aqua-input" placeholder="example.com">
-          <button id="addDomainBtn" class="aqua-btn aqua-btn-blue">Add</button>
+    <div class="body">
+      <!-- Empty state -->
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">
+          <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="8" width="24" height="20" rx="3"/>
+            <polygon points="10,24 18,16 24,20 28,15 30,24" fill="#444" opacity="0.3"/>
+            <circle cx="14" cy="14" r="2" fill="#555" opacity="0.4"/>
+            <path d="M32 14 Q40 8 40 20 Q40 32 28 34"/>
+            <polygon points="28,28 24,36 30,38" fill="#555" opacity="0.5"/>
+          </svg>
         </div>
+        <p class="empty-title">Right-click any image</p>
+        <p class="empty-desc">Select "Reverse Image Prompt" from the context menu to generate an AI prompt for any image online.</p>
       </div>
 
-      <!-- Custom Blocked Sites -->
-      <div class="panel">
-        <div class="panel-header">Blocked Sites</div>
-        <div id="blockedList" class="blocked-list">
-          <div class="empty-state">No sites blocked yet.</div>
+      <!-- Result state -->
+      <div id="resultState" class="result-state hidden">
+        <img id="resultImage" class="result-image" alt="Analyzed image" />
+        <div class="result-label">Generated Prompt</div>
+        <div id="resultBox" class="result-box"></div>
+        <div class="result-actions">
+          <button id="copyBtn" class="btn btn-primary">Copy Prompt</button>
         </div>
+        <div id="copiedMsg" class="copied-msg">Copied!</div>
       </div>
 
-      <!-- Categories -->
-      <div class="panel">
-        <div class="panel-header">Quick Categories</div>
-        <div id="categoryList" class="category-list"></div>
-      </div>
-    </div>
-
-    <!-- Focus Tab -->
-    <div class="tab-content" id="tab-focus">
-      <div class="panel focus-panel" id="focusIdle">
-        <div class="panel-header">Focus Session</div>
-        <p class="panel-desc">Start a timed focus session. Blocking will stay active for the duration.</p>
-        <div class="focus-presets">
-          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="25">25 min</button>
-          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="45">45 min</button>
-          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="60">60 min</button>
-          <button class="aqua-btn aqua-btn-graphite focus-time-btn" data-minutes="120">2 hrs</button>
-        </div>
-        <div class="custom-focus-row">
-          <input type="number" id="customMinutes" class="aqua-input" placeholder="Custom (min)" min="1" max="480">
-          <button id="startCustomFocus" class="aqua-btn aqua-btn-blue">Start</button>
-        </div>
+      <!-- Loading state -->
+      <div id="loadingState" class="loading-state hidden">
+        <div class="spinner"></div>
+        <p>Analyzing image...</p>
       </div>
 
-      <div class="panel focus-panel hidden" id="focusActive">
-        <div class="panel-header">Focus Active</div>
-        <div class="focus-timer-display">
-          <div class="timer-ring">
-            <svg viewBox="0 0 120 120" class="timer-svg">
-              <circle cx="60" cy="60" r="52" class="timer-bg" />
-              <circle cx="60" cy="60" r="52" class="timer-fg" id="timerCircle" />
-            </svg>
-            <div class="timer-text" id="timerText">00:00</div>
-          </div>
-        </div>
-        <button id="cancelFocusBtn" class="aqua-btn aqua-btn-red">End Session</button>
+      <!-- Error state -->
+      <div id="errorState" class="error-state hidden">
+        <div class="error-box" id="errorMsg"></div>
+        <button id="retryBtn" class="btn btn-secondary">Retry</button>
       </div>
     </div>
 
-    <!-- Stats Tab -->
-    <div class="tab-content" id="tab-stats">
-      <div class="panel">
-        <div class="panel-header">Your Progress</div>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value" id="statBlockedToday">0</div>
-            <div class="stat-label">Blocked Today</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="statTotalBlocked">0</div>
-            <div class="stat-label">Total Blocked</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="statSessions">0</div>
-            <div class="stat-label">Sessions</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="statFocusTime">0h</div>
-            <div class="stat-label">Focus Time</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-header">Schedule</div>
-        <div class="toggle-row">
-          <span class="toggle-label">Auto-block on Schedule</span>
-          <label class="aqua-toggle">
-            <input type="checkbox" id="scheduleToggle">
-            <span class="toggle-track">
-              <span class="toggle-thumb"></span>
-            </span>
-          </label>
-        </div>
-        <div id="scheduleOptions" class="schedule-options hidden">
-          <div class="schedule-days" id="scheduleDays"></div>
-          <div class="schedule-time-row">
-            <label>From <input type="number" id="schedStartHour" class="aqua-input time-input" min="0" max="23" value="9">:00</label>
-            <label>To <input type="number" id="schedEndHour" class="aqua-input time-input" min="0" max="23" value="17">:00</label>
-          </div>
-        </div>
-      </div>
-
-      <button id="settingsBtn" class="aqua-btn aqua-btn-graphite full-width-btn">Options & Settings</button>
+    <div class="footer">
+      <span class="footer-hint">Provider: <span id="providerName">Not configured</span></span>
     </div>
   </div>
 

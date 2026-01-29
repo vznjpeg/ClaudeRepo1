@@ -1,23 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   <defs>
-    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#6aaef7"/>
-      <stop offset="40%" stop-color="#2b6de8"/>
-      <stop offset="100%" stop-color="#1a4fbb"/>
-    </linearGradient>
-    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="white" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="white" stop-opacity="0.05"/>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#2563eb"/>
     </linearGradient>
   </defs>
-  <!-- Shadow -->
-  <path d="M64 12 L112 28 L112 76 L64 116 L16 76 L16 28 Z" fill="rgba(0,0,0,0.15)" transform="translate(2,3)"/>
-  <!-- Shield body -->
-  <path d="M64 12 L112 28 L112 76 L64 116 L16 76 L16 28 Z" fill="url(#shieldGrad)"/>
-  <!-- Shine -->
-  <path d="M64 14 L110 29 L110 52 L64 52 L18 52 L18 29 Z" fill="url(#shine)"/>
-  <!-- Checkmark -->
-  <path d="M42 62 L56 78 L88 46" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95"/>
-  <!-- Border highlight -->
-  <path d="M64 12 L112 28 L112 76 L64 116 L16 76 L16 28 Z" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+  <!-- Rounded background -->
+  <rect x="4" y="4" width="120" height="120" rx="24" ry="24" fill="url(#bgGrad)"/>
+  <!-- Image frame -->
+  <rect x="24" y="28" width="56" height="48" rx="6" ry="6" fill="none" stroke="white" stroke-width="4" opacity="0.9"/>
+  <!-- Mountain in image -->
+  <polygon points="28,72 44,50 56,64 64,54 76,72" fill="white" opacity="0.5"/>
+  <!-- Sun in image -->
+  <circle cx="38" cy="40" r="6" fill="white" opacity="0.5"/>
+  <!-- Arrow curving back -->
+  <path d="M82 44 Q100 30 100 56 Q100 80 72 84" stroke="white" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.9"/>
+  <!-- Arrowhead -->
+  <polygon points="72,76 64,86 76,90" fill="white" opacity="0.9"/>
+  <!-- Text lines representing prompt -->
+  <rect x="30" y="88" width="36" height="4" rx="2" fill="white" opacity="0.6"/>
+  <rect x="30" y="96" width="48" height="4" rx="2" fill="white" opacity="0.6"/>
+  <rect x="30" y="104" width="28" height="4" rx="2" fill="white" opacity="0.6"/>
 </svg>
