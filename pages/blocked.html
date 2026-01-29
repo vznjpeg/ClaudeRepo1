@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Site Blocked — FocusGuard</title>
   <style>
-    /* Apple 2007 Aqua Blocked Page */
+    /* Apple 2007 Aqua Blocked Page — Animal Edition */
     :root {
       --font-stack: "Lucida Grande", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
@@ -30,58 +30,70 @@
 
     .container {
       text-align: center;
-      max-width: 520px;
-      padding: 40px;
+      max-width: 560px;
+      padding: 30px 20px;
     }
 
-    /* Shield icon — large Aqua style */
-    .shield {
-      width: 100px;
-      height: 115px;
-      margin: 0 auto 30px;
+    /* ── Animal Image ────────────────────────────── */
+
+    .animal-frame {
+      width: 280px;
+      height: 210px;
+      margin: 0 auto 20px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 3px solid rgba(255,255,255,0.6);
+      box-shadow:
+        0 6px 24px rgba(0,0,0,0.3),
+        0 2px 0 rgba(255,255,255,0.3) inset;
       position: relative;
+      background: #ddd;
     }
 
-    .shield-body {
-      width: 100px;
-      height: 115px;
-      background: linear-gradient(180deg, #6aaef7 0%, #2b6de8 40%, #1a4fbb 100%);
-      clip-path: polygon(50% 0%, 100% 14%, 100% 62%, 50% 100%, 0% 62%, 0% 14%);
-      position: relative;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    .animal-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
-    .shield-body::before {
+    /* Aqua glass shine overlay on image */
+    .animal-frame::after {
       content: "";
       position: absolute;
-      top: 4px;
-      left: 8px;
-      right: 8px;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 45%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.05));
-      border-radius: 40% 40% 0 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0));
+      pointer-events: none;
     }
 
-    .shield-body::after {
-      content: "\2715";
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      font-weight: bold;
-      color: rgba(255,255,255,0.9);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      padding-top: 8px;
+    .animal-credit {
+      font-size: 9px;
+      color: rgba(255,255,255,0.6);
+      margin-top: -16px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
     }
 
-    /* Glass card */
+    .animal-credit a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+    }
+
+    .animal-credit a:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Glass Card ──────────────────────────────── */
+
     .card {
-      background: rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.78);
       border: 1px solid rgba(255,255,255,0.5);
       border-radius: 14px;
-      padding: 30px 36px;
+      padding: 24px 32px 28px;
       box-shadow:
         0 8px 32px rgba(0,0,0,0.15),
         0 1px 0 rgba(255,255,255,0.6) inset;
@@ -92,41 +104,47 @@
       font-size: 22px;
       font-weight: bold;
       color: #2c3e50;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       text-shadow: 0 1px 0 rgba(255,255,255,0.8);
     }
 
     .domain-name {
-      font-size: 15px;
-      color: #666;
-      margin-bottom: 18px;
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 16px;
       word-break: break-all;
     }
 
     .domain-name strong {
       color: #d9534f;
+      font-weight: 600;
     }
 
-    .motivation {
-      font-size: 16px;
+    /* ── Snarky Caption ──────────────────────────── */
+
+    .caption {
+      font-size: 17px;
       line-height: 1.5;
-      color: #444;
-      margin-bottom: 20px;
-      font-style: italic;
+      color: #333;
+      margin-bottom: 6px;
+      font-weight: 600;
     }
 
-    .motivation::before,
-    .motivation::after {
-      content: '"';
-      color: #aaa;
-      font-size: 20px;
+    .subcaption {
+      font-size: 13px;
+      color: #777;
+      font-style: italic;
+      margin-bottom: 18px;
+      line-height: 1.4;
     }
 
     .divider {
       height: 1px;
       background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12), transparent);
-      margin: 16px 0;
+      margin: 14px 0;
     }
+
+    /* ── Buttons ──────────────────────────────────── */
 
     .actions {
       display: flex;
@@ -149,6 +167,7 @@
       overflow: hidden;
       text-decoration: none;
       display: inline-block;
+      transition: transform 0.1s;
     }
 
     .aqua-btn::after {
@@ -184,24 +203,52 @@
     .timer-info strong {
       color: #2b6de8;
     }
+
+    .hidden { display: none !important; }
+
+    /* Loading state */
+    .animal-frame.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #e0e0e0, #ccc);
+    }
+
+    .animal-frame.loading::before {
+      content: "Loading cute distraction...";
+      font-size: 11px;
+      color: #999;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="shield">
-      <div class="shield-body"></div>
+    <!-- Animal Image -->
+    <div class="animal-frame loading" id="animalFrame">
+      <img id="animalImg" alt="Cute animal reminding you to stay focused" style="display:none">
     </div>
+    <div class="animal-credit">
+      Photo via <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> (free to use)
+    </div>
+
+    <!-- Card -->
     <div class="card">
-      <h1>This Site is Blocked</h1>
-      <div class="domain-name" id="domainName">
+      <h1>Nope. Not Today.</h1>
+      <div class="domain-name">
         <strong id="blockedDomain"></strong> is on your block list.
       </div>
-      <div class="motivation" id="motivation"></div>
+
+      <div class="caption" id="caption"></div>
+      <div class="subcaption" id="subcaption"></div>
+
       <div class="divider"></div>
+
       <div class="actions">
         <a class="aqua-btn btn-blue" id="goBackBtn" href="#">Go Back</a>
         <a class="aqua-btn btn-graphite" id="goHomeBtn" href="https://www.google.com">Search Instead</a>
       </div>
+
       <div class="timer-info hidden" id="timerInfo">
         Focus session active — <strong id="timerRemaining"></strong> remaining
       </div>
@@ -209,33 +256,198 @@
   </div>
 
   <script>
-    const QUOTES = [
-      "The secret of getting ahead is getting started.",
-      "Focus on being productive instead of busy.",
-      "Your future self will thank you.",
-      "Discipline is choosing between what you want now and what you want most.",
-      "Don't count the days. Make the days count.",
-      "Small disciplines repeated with consistency lead to great achievements.",
-      "The successful warrior is the average person with laser-like focus.",
-      "It's not about having time, it's about making time.",
-      "You will never always be motivated. You have to learn to be disciplined.",
-      "What you do today can improve all your tomorrows."
+    // ── Cute Animal Images (Unsplash — royalty free) ──
+    const ANIMALS = [
+      {
+        url: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=560&h=420&fit=crop",
+        alt: "Golden retriever looking at you"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=560&h=420&fit=crop",
+        alt: "Adorable golden retriever puppy"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1530281700549-e82e7bf110d6?w=560&h=420&fit=crop",
+        alt: "Happy dog outdoors"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=560&h=420&fit=crop",
+        alt: "Two dogs running joyfully"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1587402092301-725e37c70fd8?w=560&h=420&fit=crop",
+        alt: "Cute puppy looking up"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=560&h=420&fit=crop",
+        alt: "Cute little kitten"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?w=560&h=420&fit=crop",
+        alt: "Orange kitten with big eyes"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?w=560&h=420&fit=crop",
+        alt: "Cat looking up curiously"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=560&h=420&fit=crop",
+        alt: "Cute cat lying down"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1606567595334-d39972c85dbe?w=560&h=420&fit=crop",
+        alt: "Fluffy white kitten"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1452857297128-d9c29adba80b?w=560&h=420&fit=crop",
+        alt: "Adorable bunny rabbit"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=560&h=420&fit=crop",
+        alt: "Tiny hamster"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1535930749574-1399327ce78f?w=560&h=420&fit=crop",
+        alt: "Cute cat with bright eyes"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=560&h=420&fit=crop",
+        alt: "Happy corgi smiling"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?w=560&h=420&fit=crop",
+        alt: "Pug puppy with big eyes"
+      },
+      {
+        url: "https://images.unsplash.com/photo-1518882174711-1de40238921b?w=560&h=420&fit=crop",
+        alt: "Cute duckling"
+      }
     ];
 
+    // ── Snarky Captions (paired: headline + subtext) ──
+    const CAPTIONS = [
+      {
+        caption: "This puppy believes in you. Don't let him down.",
+        sub: "You blocked this site for a reason. Your future self is already proud."
+      },
+      {
+        caption: "Look at this face. Now close the tab.",
+        sub: "Every time you resist, a kitten earns its whiskers. Probably."
+      },
+      {
+        caption: "You really thought you'd sneak past your own block list?",
+        sub: "Bold move. But you set this up because you're smarter than your impulses."
+      },
+      {
+        caption: "This little guy finished all his tasks today. Have you?",
+        sub: "Get back to work and you can scroll guilt-free later."
+      },
+      {
+        caption: "Plot twist: the real content was the productivity you gained along the way.",
+        sub: "Your future self just sent a thank-you card from next week."
+      },
+      {
+        caption: "Nice try. This site is in timeout.",
+        sub: "Remember when you added it? That version of you was thinking clearly."
+      },
+      {
+        caption: "This furball isn't judging you. Okay, maybe a little.",
+        sub: "One habit at a time. Today, you chose focus. Good call."
+      },
+      {
+        caption: "You vs. your distractions: 1-0. Keep the streak going.",
+        sub: "Every block is a tiny win. Stack enough and you've got a great day."
+      },
+      {
+        caption: "Even this hamster has more self-control than— wait, no, you do!",
+        sub: "You literally built a system to keep yourself on track. That's elite."
+      },
+      {
+        caption: "Somewhere, a motivational poster just got its wings.",
+        sub: "You chose discipline over dopamine. That's not nothing."
+      },
+      {
+        caption: "This site called. I told it you were busy being amazing.",
+        sub: "Building good habits is just future you writing a five-star review of past you."
+      },
+      {
+        caption: "Distraction blocked. Serotonin from productivity incoming.",
+        sub: "The scroll can wait. Your goals can't."
+      },
+      {
+        caption: "I'm not mad. I'm just disappointed. Actually no, I'm proud of you.",
+        sub: "You set a boundary and you're honoring it. That takes guts."
+      },
+      {
+        caption: "This bunny hopped in to say: stay on track, champ.",
+        sub: "You didn't install a blocker to ignore it. Let's go."
+      },
+      {
+        caption: "Your attention is worth more than whatever was on that site.",
+        sub: "Protect your focus like this little one protects its treats."
+      },
+      {
+        caption: "Access denied. Cuteness granted.",
+        sub: "Think of this as a reward for your discipline, not a punishment."
+      },
+      {
+        caption: "That site isn't going anywhere. But your momentum might.",
+        sub: "Stay in the zone. You'll thank yourself at the end of the day."
+      },
+      {
+        caption: "You came here looking for a distraction. Here's a better one.",
+        sub: "Pet the screen if you must. Then get back to work."
+      },
+      {
+        caption: "Breaking news: you chose yourself over mindless scrolling.",
+        sub: "That's the headline. Everything else is noise."
+      },
+      {
+        caption: "This duck thinks you're doing great. Don't prove it wrong.",
+        sub: "Small wins compound. This moment right here? That's compound interest."
+      }
+    ];
+
+    // ── Pick random image + caption (different each visit) ──
+    const animalIdx = Math.floor(Math.random() * ANIMALS.length);
+    const captionIdx = Math.floor(Math.random() * CAPTIONS.length);
+
+    const animal = ANIMALS[animalIdx];
+    const chosen = CAPTIONS[captionIdx];
+
+    // ── Set content ──
     const params = new URLSearchParams(window.location.search);
     const domain = params.get("domain") || "this site";
 
     document.getElementById("blockedDomain").textContent = domain;
-    document.getElementById("motivation").textContent =
-      QUOTES[Math.floor(Math.random() * QUOTES.length)];
+    document.getElementById("caption").textContent = chosen.caption;
+    document.getElementById("subcaption").textContent = chosen.sub;
 
+    // Load image
+    const img = document.getElementById("animalImg");
+    const frame = document.getElementById("animalFrame");
+
+    img.onload = function() {
+      frame.classList.remove("loading");
+      img.style.display = "block";
+    };
+
+    img.onerror = function() {
+      // Fallback: hide frame and just show text
+      frame.style.display = "none";
+    };
+
+    img.src = animal.url;
+    img.alt = animal.alt;
+
+    // ── Navigation ──
     document.getElementById("goBackBtn").addEventListener("click", (e) => {
       e.preventDefault();
       if (history.length > 1) history.back();
       else window.location.href = "https://www.google.com";
     });
 
-    // Check focus session timer
+    // ── Focus session timer ──
     chrome.runtime.sendMessage({ type: "GET_STATE" }, (res) => {
       if (res && res.state && res.state.focusSession) {
         const remaining = Math.max(0, res.state.focusSession.endTime - Date.now());
