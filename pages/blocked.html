@@ -5,49 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Site Blocked — FocusGuard</title>
   <style>
-    /* Apple 2007 Aqua Blocked Page — Animal Edition */
+    /* Classic Macintosh / System 7 Blocked Page */
     :root {
-      --font-stack: "Lucida Grande", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --cream: #f5f0e1;
+      --cream-dark: #e8e0cc;
+      --black: #1a1a1a;
+      --white: #fffef5;
+      --border: 2px solid var(--black);
+      --border-thin: 1px solid var(--black);
+      --font: "Geneva", "ChicagoFLF", "Charcoal", "Lucida Grande", "Monaco", monospace;
+      --shadow: 4px 4px 0 var(--black);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
-      font-family: var(--font-stack);
-      background:
+      font-family: var(--font);
+      background: var(--cream);
+      /* Classic Mac desktop pattern */
+      background-image:
         repeating-linear-gradient(
           0deg,
-          transparent, transparent 1px,
-          rgba(255,255,255,0.04) 1px, rgba(255,255,255,0.04) 2px
+          transparent 0px, transparent 1px,
+          rgba(0,0,0,0.03) 1px, rgba(0,0,0,0.03) 2px
         ),
-        linear-gradient(180deg, #b0b8c4 0%, #8a94a4 30%, #6a7688 60%, #8a94a4 100%);
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px, transparent 1px,
+          rgba(0,0,0,0.03) 1px, rgba(0,0,0,0.03) 2px
+        );
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #1a1a1a;
+      color: var(--black);
+      image-rendering: pixelated;
     }
 
     .container {
       text-align: center;
-      max-width: 560px;
+      max-width: 520px;
       padding: 30px 20px;
+    }
+
+    /* ── Classic Mac Window ───────────────────────── */
+
+    .window {
+      background: var(--white);
+      border: var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .window-titlebar {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-bottom: var(--border);
+      background: var(--white);
+      /* Classic horizontal lines pattern in titlebar */
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent 0px, transparent 2px,
+          var(--cream-dark) 2px, var(--cream-dark) 3px
+        );
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 5px;
+      margin-right: 10px;
+    }
+
+    .window-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: var(--border-thin);
+      background: var(--white);
+    }
+
+    .window-dot:first-child {
+      background: var(--black);
+    }
+
+    .window-title {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      background: var(--white);
+      padding: 0 8px;
+    }
+
+    .window-body {
+      padding: 20px 24px 24px;
     }
 
     /* ── Animal Image ────────────────────────────── */
 
     .animal-frame {
-      width: 280px;
-      height: 210px;
-      margin: 0 auto 20px;
-      border-radius: 14px;
+      width: 260px;
+      height: 195px;
+      margin: 0 auto 6px;
+      border: var(--border);
       overflow: hidden;
-      border: 3px solid rgba(255,255,255,0.6);
-      box-shadow:
-        0 6px 24px rgba(0,0,0,0.3),
-        0 2px 0 rgba(255,255,255,0.3) inset;
       position: relative;
-      background: #ddd;
+      background: var(--cream-dark);
+      /* Dithered loading pattern */
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          transparent 0px, transparent 2px,
+          rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+        );
     }
 
     .animal-frame img {
@@ -55,93 +128,72 @@
       height: 100%;
       object-fit: cover;
       display: block;
-    }
-
-    /* Aqua glass shine overlay on image */
-    .animal-frame::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 45%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0));
-      pointer-events: none;
+      /* Retro halftone feel */
+      filter: contrast(1.1) saturate(0.3);
     }
 
     .animal-credit {
       font-size: 9px;
-      color: rgba(255,255,255,0.6);
-      margin-top: -16px;
-      margin-bottom: 18px;
-      position: relative;
-      z-index: 1;
+      color: #888;
+      margin-bottom: 14px;
     }
 
     .animal-credit a {
-      color: rgba(255,255,255,0.7);
+      color: #666;
       text-decoration: none;
+      border-bottom: 1px dotted #999;
     }
 
-    .animal-credit a:hover {
-      text-decoration: underline;
-    }
-
-    /* ── Glass Card ──────────────────────────────── */
-
-    .card {
-      background: rgba(255,255,255,0.78);
-      border: 1px solid rgba(255,255,255,0.5);
-      border-radius: 14px;
-      padding: 24px 32px 28px;
-      box-shadow:
-        0 8px 32px rgba(0,0,0,0.15),
-        0 1px 0 rgba(255,255,255,0.6) inset;
-      backdrop-filter: blur(12px);
-    }
+    /* ── Content ──────────────────────────────────── */
 
     h1 {
-      font-size: 22px;
+      font-size: 18px;
       font-weight: bold;
-      color: #2c3e50;
+      color: var(--black);
       margin-bottom: 4px;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .domain-name {
-      font-size: 13px;
+      font-size: 11px;
       color: #888;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       word-break: break-all;
+      font-family: "Monaco", monospace;
     }
 
     .domain-name strong {
-      color: #d9534f;
-      font-weight: 600;
+      color: var(--black);
+      font-weight: bold;
     }
 
-    /* ── Snarky Caption ──────────────────────────── */
-
     .caption {
-      font-size: 17px;
+      font-size: 14px;
       line-height: 1.5;
-      color: #333;
-      margin-bottom: 6px;
-      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 4px;
+      font-weight: bold;
     }
 
     .subcaption {
-      font-size: 13px;
-      color: #777;
+      font-size: 11px;
+      color: #666;
       font-style: italic;
-      margin-bottom: 18px;
-      line-height: 1.4;
+      margin-bottom: 16px;
+      line-height: 1.5;
     }
 
     .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12), transparent);
+      height: 2px;
       margin: 14px 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--black) 0px, var(--black) 4px,
+          transparent 4px, transparent 8px
+        );
+      opacity: 0.3;
     }
 
     /* ── Buttons ──────────────────────────────────── */
@@ -153,55 +205,51 @@
       flex-wrap: wrap;
     }
 
-    .aqua-btn {
-      font-family: var(--font-stack);
-      font-size: 13px;
+    .mac-btn {
+      font-family: var(--font);
+      font-size: 12px;
       font-weight: bold;
-      padding: 8px 22px;
-      border-radius: 6px;
-      border: 1px solid rgba(0,0,0,0.25);
+      padding: 7px 24px;
+      border: var(--border);
       cursor: pointer;
-      text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
-      color: #fff;
-      position: relative;
-      overflow: hidden;
+      color: var(--black);
+      background: var(--white);
+      box-shadow: 2px 2px 0 var(--black);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       text-decoration: none;
       display: inline-block;
-      transition: transform 0.1s;
+      transition: all 0.05s;
     }
 
-    .aqua-btn::after {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 50%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.1));
-      border-radius: 5px 5px 0 0;
-      pointer-events: none;
+    .mac-btn:active {
+      background: var(--black);
+      color: var(--white);
+      box-shadow: none;
+      transform: translate(2px, 2px);
     }
 
-    .aqua-btn:active { transform: scale(0.97); }
-
-    .btn-blue {
-      background: linear-gradient(180deg, #6aaef7 0%, #2b6de8 50%, #1a4fbb 100%);
-      border-color: #1a4fbb;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    .mac-btn-primary {
+      background: var(--black);
+      color: var(--white);
     }
 
-    .btn-graphite {
-      background: linear-gradient(180deg, #a8aeb5 0%, #7a7f85 50%, #555a5f 100%);
-      border-color: #444;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    .mac-btn-primary:active {
+      background: var(--white);
+      color: var(--black);
     }
 
     .timer-info {
       margin-top: 14px;
-      font-size: 12px;
-      color: #777;
+      font-size: 11px;
+      color: #666;
+      font-weight: bold;
+      letter-spacing: 0.5px;
     }
 
     .timer-info strong {
-      color: #2b6de8;
+      color: var(--black);
+      font-family: "Monaco", monospace;
     }
 
     .hidden { display: none !important; }
@@ -211,47 +259,74 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(180deg, #e0e0e0, #ccc);
     }
 
     .animal-frame.loading::before {
-      content: "Loading cute distraction...";
-      font-size: 11px;
+      content: "[ loading... ]";
+      font-size: 10px;
       color: #999;
-      font-style: italic;
+      font-family: "Monaco", monospace;
+      letter-spacing: 1px;
+    }
+
+    /* ── Dither border decoration at bottom ───────── */
+
+    .window-footer {
+      height: 6px;
+      border-top: var(--border-thin);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--black) 0px, var(--black) 1px,
+          var(--white) 1px, var(--white) 3px
+        );
+      opacity: 0.2;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Animal Image -->
-    <div class="animal-frame loading" id="animalFrame">
-      <img id="animalImg" alt="Cute animal reminding you to stay focused" style="display:none">
-    </div>
-    <div class="animal-credit">
-      Photo via <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> (free to use)
-    </div>
-
-    <!-- Card -->
-    <div class="card">
-      <h1>Nope. Not Today.</h1>
-      <div class="domain-name">
-        <strong id="blockedDomain"></strong> is on your block list.
+    <div class="window">
+      <!-- Classic Mac title bar -->
+      <div class="window-titlebar">
+        <div class="window-dots">
+          <div class="window-dot"></div>
+          <div class="window-dot"></div>
+          <div class="window-dot"></div>
+        </div>
+        <span class="window-title">Site Blocked</span>
       </div>
 
-      <div class="caption" id="caption"></div>
-      <div class="subcaption" id="subcaption"></div>
+      <div class="window-body">
+        <!-- Animal Image -->
+        <div class="animal-frame loading" id="animalFrame">
+          <img id="animalImg" alt="Cute animal reminding you to stay focused" style="display:none">
+        </div>
+        <div class="animal-credit">
+          Photo via <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>
+        </div>
 
-      <div class="divider"></div>
+        <h1>Nope. Not Today.</h1>
+        <div class="domain-name">
+          <strong id="blockedDomain"></strong> is on your block list.
+        </div>
 
-      <div class="actions">
-        <a class="aqua-btn btn-blue" id="goBackBtn" href="#">Go Back</a>
-        <a class="aqua-btn btn-graphite" id="goHomeBtn" href="https://www.google.com">Search Instead</a>
+        <div class="caption" id="caption"></div>
+        <div class="subcaption" id="subcaption"></div>
+
+        <div class="divider"></div>
+
+        <div class="actions">
+          <a class="mac-btn mac-btn-primary" id="goBackBtn" href="#">Go Back</a>
+          <a class="mac-btn" id="goHomeBtn" href="https://www.google.com">Search Instead</a>
+        </div>
+
+        <div class="timer-info hidden" id="timerInfo">
+          Focus session active — <strong id="timerRemaining"></strong> remaining
+        </div>
       </div>
 
-      <div class="timer-info hidden" id="timerInfo">
-        Focus session active — <strong id="timerRemaining"></strong> remaining
-      </div>
+      <div class="window-footer"></div>
     </div>
   </div>
 
@@ -408,7 +483,7 @@
       }
     ];
 
-    // ── Pick random image + caption (different each visit) ──
+    // ── Pick random image + caption ──
     const animalIdx = Math.floor(Math.random() * ANIMALS.length);
     const captionIdx = Math.floor(Math.random() * CAPTIONS.length);
 
@@ -433,7 +508,6 @@
     };
 
     img.onerror = function() {
-      // Fallback: hide frame and just show text
       frame.style.display = "none";
     };
 
