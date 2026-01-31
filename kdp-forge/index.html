@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDP Forge - Low Content Book Creator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">&#9776;</span>
+            <h1>KDP Forge</h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-link active" data-page="dashboard">
+                <span class="nav-icon">&#9632;</span> Dashboard
+            </a></li>
+            <li><a href="#" class="nav-link" data-page="research">
+                <span class="nav-icon">&#128269;</span> Niche Research
+            </a></li>
+            <li><a href="#" class="nav-link" data-page="cover-designer">
+                <span class="nav-icon">&#127912;</span> Cover Designer
+            </a></li>
+            <li><a href="#" class="nav-link" data-page="interiors">
+                <span class="nav-icon">&#128195;</span> Interior Generator
+            </a></li>
+            <li><a href="#" class="nav-link" data-page="puzzles">
+                <span class="nav-icon">&#129513;</span> Puzzle Maker
+            </a></li>
+            <li><a href="#" class="nav-link" data-page="listing">
+                <span class="nav-icon">&#128196;</span> Listing Helper
+            </a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p>KDP Forge v1.0</p>
+        </div>
+    </nav>
+
+    <main class="content">
+        <!-- Dashboard -->
+        <section id="page-dashboard" class="page active">
+            <div class="page-header">
+                <h2>Dashboard</h2>
+                <p class="subtitle">Your low-content book publishing command center</p>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <div class="dash-card-icon">&#128269;</div>
+                    <h3>Niche Research</h3>
+                    <p>Find profitable niches with keyword analysis, competition scores, and estimated revenue.</p>
+                    <button class="btn btn-primary" onclick="navigateTo('research')">Start Research</button>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-icon">&#127912;</div>
+                    <h3>Cover Designer</h3>
+                    <p>Create professional book covers with our drag-and-drop editor. KDP-ready PDF export.</p>
+                    <button class="btn btn-primary" onclick="navigateTo('cover-designer')">Design Cover</button>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-icon">&#128195;</div>
+                    <h3>Interior Generator</h3>
+                    <p>Generate journal, planner, and notebook interiors from dozens of templates.</p>
+                    <button class="btn btn-primary" onclick="navigateTo('interiors')">Create Interior</button>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-icon">&#129513;</div>
+                    <h3>Puzzle Maker</h3>
+                    <p>Auto-generate word searches, Sudoku, crosswords, and more for activity books.</p>
+                    <button class="btn btn-primary" onclick="navigateTo('puzzles')">Make Puzzles</button>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-icon">&#128196;</div>
+                    <h3>Listing Helper</h3>
+                    <p>Optimize your KDP listing with AI-powered titles, descriptions, and keyword suggestions.</p>
+                    <button class="btn btn-primary" onclick="navigateTo('listing')">Optimize Listing</button>
+                </div>
+                <div class="dash-card dash-card-stats">
+                    <div class="dash-card-icon">&#128200;</div>
+                    <h3>Quick Stats</h3>
+                    <div class="stats-row">
+                        <div class="stat"><span class="stat-num" id="stat-covers">0</span><span class="stat-label">Covers</span></div>
+                        <div class="stat"><span class="stat-num" id="stat-interiors">0</span><span class="stat-label">Interiors</span></div>
+                        <div class="stat"><span class="stat-num" id="stat-puzzles">0</span><span class="stat-label">Puzzles</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Niche Research -->
+        <section id="page-research" class="page">
+            <div class="page-header">
+                <h2>Niche Research</h2>
+                <p class="subtitle">Find profitable low-content book niches on Amazon KDP</p>
+            </div>
+            <div class="research-controls">
+                <div class="search-bar">
+                    <input type="text" id="research-keyword" placeholder="Enter a keyword (e.g., 'gratitude journal', 'sudoku')..." />
+                    <button class="btn btn-primary" id="btn-research">Analyze</button>
+                </div>
+                <div class="filter-row">
+                    <select id="research-category">
+                        <option value="all">All Categories</option>
+                        <option value="journals">Journals & Planners</option>
+                        <option value="coloring">Coloring Books</option>
+                        <option value="puzzle">Puzzle & Activity</option>
+                        <option value="notebook">Notebooks</option>
+                        <option value="logbook">Log Books</option>
+                    </select>
+                    <select id="research-sort">
+                        <option value="relevance">Sort by Relevance</option>
+                        <option value="demand">Sort by Demand</option>
+                        <option value="competition">Sort by Low Competition</option>
+                        <option value="revenue">Sort by Est. Revenue</option>
+                    </select>
+                </div>
+            </div>
+            <div id="research-results" class="research-results">
+                <div class="placeholder-msg">Enter a keyword above to discover profitable niches.</div>
+            </div>
+        </section>
+
+        <!-- Cover Designer -->
+        <section id="page-cover-designer" class="page">
+            <div class="page-header">
+                <h2>Cover Designer</h2>
+                <p class="subtitle">Create professional KDP book covers</p>
+            </div>
+            <div class="designer-layout">
+                <div class="designer-toolbar">
+                    <h3>Book Settings</h3>
+                    <div class="tool-group">
+                        <label>Trim Size</label>
+                        <select id="cover-trim">
+                            <option value="6x9">6" x 9" (Standard)</option>
+                            <option value="5.5x8.5">5.5" x 8.5"</option>
+                            <option value="8.5x11">8.5" x 11"</option>
+                            <option value="5x8">5" x 8"</option>
+                            <option value="8x10">8" x 10"</option>
+                        </select>
+                    </div>
+                    <h3>Background</h3>
+                    <div class="tool-group">
+                        <label>Color</label>
+                        <input type="color" id="cover-bg-color" value="#1a1a2e" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Gradient</label>
+                        <input type="color" id="cover-bg-gradient" value="#16213e" />
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="cover-use-gradient" checked /> Enable
+                        </label>
+                    </div>
+                    <h3>Title</h3>
+                    <div class="tool-group">
+                        <input type="text" id="cover-title" placeholder="Book Title" value="My Journal" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Font Size</label>
+                        <input type="range" id="cover-title-size" min="16" max="80" value="42" />
+                        <span id="cover-title-size-val">42px</span>
+                    </div>
+                    <div class="tool-group">
+                        <label>Color</label>
+                        <input type="color" id="cover-title-color" value="#e2b714" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Font</label>
+                        <select id="cover-title-font">
+                            <option value="Georgia, serif">Georgia (Serif)</option>
+                            <option value="Arial, sans-serif">Arial (Sans)</option>
+                            <option value="'Courier New', monospace">Courier (Mono)</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="Impact, sans-serif">Impact</option>
+                            <option value="Verdana, sans-serif">Verdana</option>
+                        </select>
+                    </div>
+                    <h3>Subtitle</h3>
+                    <div class="tool-group">
+                        <input type="text" id="cover-subtitle" placeholder="Subtitle (optional)" value="A Daily Reflection" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Color</label>
+                        <input type="color" id="cover-subtitle-color" value="#ffffff" />
+                    </div>
+                    <h3>Author</h3>
+                    <div class="tool-group">
+                        <input type="text" id="cover-author" placeholder="Author Name" value="Jane Smith" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Color</label>
+                        <input type="color" id="cover-author-color" value="#cccccc" />
+                    </div>
+                    <h3>Decoration</h3>
+                    <div class="tool-group">
+                        <label>Border</label>
+                        <select id="cover-border">
+                            <option value="none">None</option>
+                            <option value="simple" selected>Simple Line</option>
+                            <option value="double">Double Line</option>
+                            <option value="ornate">Ornate Frame</option>
+                        </select>
+                    </div>
+                    <div class="tool-group">
+                        <label>Border Color</label>
+                        <input type="color" id="cover-border-color" value="#e2b714" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Shape</label>
+                        <select id="cover-shape">
+                            <option value="none">None</option>
+                            <option value="circle">Circle</option>
+                            <option value="diamond">Diamond</option>
+                            <option value="line-art">Decorative Lines</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-full" id="btn-export-cover">Export as PNG</button>
+                </div>
+                <div class="designer-canvas-wrap">
+                    <canvas id="cover-canvas" width="450" height="675"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interior Generator -->
+        <section id="page-interiors" class="page">
+            <div class="page-header">
+                <h2>Interior Generator</h2>
+                <p class="subtitle">Generate print-ready book interiors from templates</p>
+            </div>
+            <div class="interior-layout">
+                <div class="interior-sidebar">
+                    <h3>Template</h3>
+                    <div class="template-grid">
+                        <button class="template-btn active" data-template="lined">Lined Journal</button>
+                        <button class="template-btn" data-template="dotgrid">Dot Grid</button>
+                        <button class="template-btn" data-template="graph">Graph Paper</button>
+                        <button class="template-btn" data-template="planner-daily">Daily Planner</button>
+                        <button class="template-btn" data-template="planner-weekly">Weekly Planner</button>
+                        <button class="template-btn" data-template="habit">Habit Tracker</button>
+                        <button class="template-btn" data-template="gratitude">Gratitude Journal</button>
+                        <button class="template-btn" data-template="budget">Budget Tracker</button>
+                        <button class="template-btn" data-template="reading-log">Reading Log</button>
+                        <button class="template-btn" data-template="recipe">Recipe Book</button>
+                        <button class="template-btn" data-template="fitness">Fitness Log</button>
+                        <button class="template-btn" data-template="cornell">Cornell Notes</button>
+                    </div>
+                    <h3>Settings</h3>
+                    <div class="tool-group">
+                        <label>Page Size</label>
+                        <select id="interior-size">
+                            <option value="6x9">6" x 9"</option>
+                            <option value="5.5x8.5">5.5" x 8.5"</option>
+                            <option value="8.5x11">8.5" x 11"</option>
+                        </select>
+                    </div>
+                    <div class="tool-group">
+                        <label>Pages</label>
+                        <input type="number" id="interior-pages" value="120" min="24" max="800" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Header Text</label>
+                        <input type="text" id="interior-header" placeholder="Optional page header..." />
+                    </div>
+                    <div class="tool-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="interior-page-numbers" checked /> Page Numbers
+                        </label>
+                    </div>
+                    <div class="tool-group">
+                        <label>Line/Grid Color</label>
+                        <input type="color" id="interior-line-color" value="#cccccc" />
+                    </div>
+                    <button class="btn btn-primary btn-full" id="btn-export-interior">Export as PNG</button>
+                </div>
+                <div class="interior-preview">
+                    <canvas id="interior-canvas" width="450" height="675"></canvas>
+                    <p class="preview-label">Page Preview</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Puzzle Maker -->
+        <section id="page-puzzles" class="page">
+            <div class="page-header">
+                <h2>Puzzle Maker</h2>
+                <p class="subtitle">Generate puzzles for activity and puzzle books</p>
+            </div>
+            <div class="puzzle-layout">
+                <div class="puzzle-sidebar">
+                    <h3>Puzzle Type</h3>
+                    <div class="template-grid">
+                        <button class="puzzle-type-btn active" data-puzzle="wordsearch">Word Search</button>
+                        <button class="puzzle-type-btn" data-puzzle="sudoku">Sudoku</button>
+                        <button class="puzzle-type-btn" data-puzzle="crossword">Crossword</button>
+                        <button class="puzzle-type-btn" data-puzzle="maze">Maze</button>
+                    </div>
+
+                    <div id="wordsearch-options" class="puzzle-options">
+                        <h3>Word Search Options</h3>
+                        <div class="tool-group">
+                            <label>Grid Size</label>
+                            <select id="ws-size">
+                                <option value="10">10 x 10 (Easy)</option>
+                                <option value="15" selected>15 x 15 (Medium)</option>
+                                <option value="20">20 x 20 (Hard)</option>
+                            </select>
+                        </div>
+                        <div class="tool-group">
+                            <label>Words (comma-separated)</label>
+                            <textarea id="ws-words" rows="4" placeholder="CAT, DOG, FISH, BIRD, SNAKE...">CAT, DOG, FISH, BIRD, SNAKE, HORSE, RABBIT, TURTLE, EAGLE, DOLPHIN</textarea>
+                        </div>
+                        <div class="tool-group">
+                            <label>Title</label>
+                            <input type="text" id="ws-title" value="Animal Word Search" />
+                        </div>
+                    </div>
+
+                    <div id="sudoku-options" class="puzzle-options" style="display:none">
+                        <h3>Sudoku Options</h3>
+                        <div class="tool-group">
+                            <label>Difficulty</label>
+                            <select id="sudoku-difficulty">
+                                <option value="easy">Easy (35+ clues)</option>
+                                <option value="medium" selected>Medium (28-34 clues)</option>
+                                <option value="hard">Hard (22-27 clues)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="crossword-options" class="puzzle-options" style="display:none">
+                        <h3>Crossword Options</h3>
+                        <div class="tool-group">
+                            <label>Words & Clues (word:clue per line)</label>
+                            <textarea id="cw-words" rows="6" placeholder="PYTHON:A popular programming language&#10;JAVA:Coffee-named language">APPLE:A popular fruit
+GRAPE:Small round fruit
+PEACH:Fuzzy stone fruit
+LEMON:Sour citrus fruit
+MANGO:Tropical stone fruit
+BERRY:Small juicy fruit
+MELON:Large round fruit</textarea>
+                        </div>
+                    </div>
+
+                    <div id="maze-options" class="puzzle-options" style="display:none">
+                        <h3>Maze Options</h3>
+                        <div class="tool-group">
+                            <label>Size</label>
+                            <select id="maze-size">
+                                <option value="10">10 x 10 (Easy)</option>
+                                <option value="15" selected>15 x 15 (Medium)</option>
+                                <option value="20">20 x 20 (Hard)</option>
+                                <option value="30">30 x 30 (Expert)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-full" id="btn-generate-puzzle">Generate Puzzle</button>
+                    <button class="btn btn-secondary btn-full" id="btn-export-puzzle">Export as PNG</button>
+                </div>
+                <div class="puzzle-preview">
+                    <canvas id="puzzle-canvas" width="550" height="650"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Listing Helper -->
+        <section id="page-listing" class="page">
+            <div class="page-header">
+                <h2>KDP Listing Helper</h2>
+                <p class="subtitle">Optimize your Amazon KDP book listing for maximum visibility</p>
+            </div>
+            <div class="listing-layout">
+                <div class="listing-input-section">
+                    <h3>Book Details</h3>
+                    <div class="tool-group">
+                        <label>Book Type</label>
+                        <select id="listing-type">
+                            <option value="journal">Journal / Diary</option>
+                            <option value="planner">Planner / Organizer</option>
+                            <option value="coloring">Coloring Book</option>
+                            <option value="puzzle">Puzzle / Activity Book</option>
+                            <option value="notebook">Notebook</option>
+                            <option value="logbook">Log Book / Tracker</option>
+                            <option value="workbook">Workbook</option>
+                            <option value="sketchbook">Sketchbook</option>
+                        </select>
+                    </div>
+                    <div class="tool-group">
+                        <label>Niche/Topic</label>
+                        <input type="text" id="listing-niche" placeholder="e.g., gardening, mindfulness, fitness..." value="" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Target Audience</label>
+                        <input type="text" id="listing-audience" placeholder="e.g., women, kids, seniors, teachers..." value="" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Key Features (comma-separated)</label>
+                        <input type="text" id="listing-features" placeholder="e.g., 120 pages, premium paper, guided prompts..." value="" />
+                    </div>
+                    <div class="tool-group">
+                        <label>Trim Size</label>
+                        <select id="listing-trim">
+                            <option value="6x9">6" x 9"</option>
+                            <option value="5.5x8.5">5.5" x 8.5"</option>
+                            <option value="8.5x11">8.5" x 11"</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-full" id="btn-generate-listing">Generate Listing</button>
+                </div>
+                <div class="listing-output-section">
+                    <div id="listing-results" class="listing-results">
+                        <div class="placeholder-msg">Fill in your book details and click "Generate Listing" to get optimized titles, descriptions, and keywords.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
