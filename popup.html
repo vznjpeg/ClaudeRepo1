@@ -19,6 +19,12 @@
       <div class="titlebar-badge" id="blockedCount" title="Sites blocked today">0</div>
     </div>
 
+    <!-- Sync Status Indicator -->
+    <div class="sync-bar" id="syncBar">
+      <span class="sync-icon">&#x21BB;</span>
+      <span class="sync-text">Synced across devices via Google account</span>
+    </div>
+
     <!-- Master Toggle -->
     <div class="panel master-toggle-panel">
       <div class="toggle-row">
@@ -35,6 +41,7 @@
     <!-- Tab Bar -->
     <div class="tab-bar">
       <button class="tab active" data-tab="block">Block</button>
+      <button class="tab" data-tab="hide">Hide</button>
       <button class="tab" data-tab="focus">Focus</button>
       <button class="tab" data-tab="stats">Stats</button>
     </div>
@@ -62,6 +69,28 @@
       <div class="panel">
         <div class="panel-header">Quick Categories</div>
         <div id="categoryList" class="category-list"></div>
+      </div>
+    </div>
+
+    <!-- Hide Tab (Element Hider) -->
+    <div class="tab-content" id="tab-hide">
+      <div class="panel">
+        <div class="panel-header">Hide Distracting Elements</div>
+        <p class="panel-desc">Selectively hide attention-grabbing sections on social platforms without fully blocking them. Navigate to a supported site to see its sections.</p>
+      </div>
+
+      <!-- Platform Sections -->
+      <div class="panel" id="hideCurrentSite">
+        <div class="panel-header" id="hidePlatformTitle">Select a Platform</div>
+        <div id="hideSectionsList" class="hide-sections-list">
+          <div class="empty-state">Visit Instagram, Facebook, YouTube, Twitter/X, or LinkedIn to configure element hiding for that site.</div>
+        </div>
+      </div>
+
+      <!-- All Platforms Quick Config -->
+      <div class="panel">
+        <div class="panel-header">All Platforms</div>
+        <div class="platform-quick-list" id="platformQuickList"></div>
       </div>
     </div>
 
@@ -121,6 +150,30 @@
         </div>
       </div>
 
+      <!-- Exercise Stats -->
+      <div class="panel">
+        <div class="panel-header">Exercise Challenge</div>
+        <div class="toggle-row">
+          <span class="toggle-label">Require Exercise on Block</span>
+          <label class="aqua-toggle">
+            <input type="checkbox" id="exerciseToggle" checked>
+            <span class="toggle-track">
+              <span class="toggle-thumb"></span>
+            </span>
+          </label>
+        </div>
+        <div class="stats-grid" style="margin-top: 8px;">
+          <div class="stat-card">
+            <div class="stat-value" id="statExercises">0</div>
+            <div class="stat-label">Exercises Done</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statReps">0</div>
+            <div class="stat-label">Total Reps</div>
+          </div>
+        </div>
+      </div>
+
       <div class="panel">
         <div class="panel-header">Schedule</div>
         <div class="toggle-row">
@@ -138,6 +191,14 @@
             <label>From <input type="number" id="schedStartHour" class="aqua-input time-input" min="0" max="23" value="9">:00</label>
             <label>To <input type="number" id="schedEndHour" class="aqua-input time-input" min="0" max="23" value="17">:00</label>
           </div>
+        </div>
+      </div>
+
+      <!-- Browsing History Summary -->
+      <div class="panel">
+        <div class="panel-header">Browsing History (7 days)</div>
+        <div id="historyStats" class="history-stats">
+          <div class="empty-state">Loading history...</div>
         </div>
       </div>
 

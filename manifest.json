@@ -1,14 +1,16 @@
 {
   "manifest_version": 3,
   "name": "FocusGuard",
-  "version": "1.0.0",
-  "description": "Block distracting websites and stay focused. Beautifully crafted.",
+  "version": "2.0.0",
+  "description": "Block distracting websites, hide attention-grabbing elements, and earn your browsing with exercise challenges. Syncs across devices via Google account.",
   "permissions": [
     "storage",
     "declarativeNetRequest",
     "declarativeNetRequestFeedback",
     "alarms",
-    "tabs"
+    "tabs",
+    "history",
+    "identity"
   ],
   "host_permissions": ["<all_urls>"],
   "background": {
@@ -30,5 +32,20 @@
   "declarative_net_request": {
     "rule_resources": []
   },
-  "options_page": "pages/options.html"
+  "options_page": "pages/options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.instagram.com/*",
+        "*://*.facebook.com/*",
+        "*://*.youtube.com/*",
+        "*://*.twitter.com/*",
+        "*://*.x.com/*",
+        "*://*.linkedin.com/*"
+      ],
+      "js": ["content_scripts/distraction-hider.js"],
+      "css": ["content_scripts/distraction-hider.css"],
+      "run_at": "document_idle"
+    }
+  ]
 }

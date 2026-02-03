@@ -1,5 +1,6 @@
 // FocusGuard — Background Service Worker
-// Handles blocking rules, focus sessions, and statistics tracking.
+// Handles blocking rules, focus sessions, statistics tracking,
+// exercise challenges, browsing history, and cross-device sync.
 
 const PRESET_CATEGORIES = {
   social: {
@@ -66,6 +67,20 @@ const PRESET_CATEGORIES = {
   }
 };
 
+// Exercise challenges — each requires completing 2 reps
+const EXERCISE_CHALLENGES = [
+  { name: "Push-ups", quantity: 2, emoji: "\u{1F4AA}", instruction: "Get down and do 2 push-ups. Full range of motion!" },
+  { name: "Squats", quantity: 2, emoji: "\u{1F9CE}", instruction: "Stand up and do 2 squats. Go deep!" },
+  { name: "Jumping Jacks", quantity: 2, emoji: "\u2B50", instruction: "Do 2 jumping jacks. Arms all the way up!" },
+  { name: "Burpees", quantity: 2, emoji: "\u{1F525}", instruction: "Do 2 burpees. Down, push-up, jump!" },
+  { name: "Lunges", quantity: 2, emoji: "\u{1F3CB}", instruction: "Do 2 lunges — one each leg. Keep your back straight!" },
+  { name: "High Knees", quantity: 2, emoji: "\u{1F3C3}", instruction: "Do 2 high knees — one per leg. Drive those knees up!" },
+  { name: "Calf Raises", quantity: 2, emoji: "\u{1F9B6}", instruction: "Do 2 calf raises. Rise up on your toes and hold!" },
+  { name: "Mountain Climbers", quantity: 2, emoji: "\u26F0\uFE0F", instruction: "Do 2 mountain climbers — one per side. Get in plank and drive!" },
+  { name: "Sit-ups", quantity: 2, emoji: "\u{1F4A5}", instruction: "Do 2 sit-ups. Hands behind your head, all the way up!" },
+  { name: "Tricep Dips", quantity: 2, emoji: "\u{1F4AA}", instruction: "Do 2 tricep dips off your chair. Elbows back, dip down!" }
+];
+
 // Default state
 const DEFAULT_STATE = {
   enabled: true,
@@ -77,25 +92,43 @@ const DEFAULT_STATE = {
     blockedToday: 0,
     lastResetDate: new Date().toDateString(),
     sessionsCompleted: 0,
-    totalFocusMinutes: 0
+    totalFocusMinutes: 0,
+    exercisesCompleted: 0,
+    totalExerciseReps: 0
   },
   schedule: {
     enabled: false,
     days: [1, 2, 3, 4, 5], // Mon-Fri
     startHour: 9,
     endHour: 17
-  }
+  },
+  exerciseChallengeEnabled: true,
+  browsingHistory: [] // { domain, timestamp, wasBlocked }
 };
 
-// ── State Management ──
+// ── State Management (uses chrome.storage.sync for cross-device sync) ──
 
 async function getState() {
-  const result = await chrome.storage.local.get("focusGuardState");
+  const result = await chrome.storage.sync.get("focusGuardState");
   return result.focusGuardState || { ...DEFAULT_STATE };
 }
 
 async function setState(state) {
-  await chrome.storage.local.set({ focusGuardState: state });
+  await chrome.storage.sync.set({ focusGuardState: state });
+}
+
+// Browsing history is stored locally (too large for sync quota)
+async function getBrowsingHistory() {
+  const result = await chrome.storage.local.get("focusGuardHistory");
+  return result.focusGuardHistory || [];
+}
+
+async function addBrowsingHistoryEntry(entry) {
+  const history = await getBrowsingHistory();
+  history.unshift(entry); // newest first
+  // Keep only last 500 entries to stay within storage limits
+  if (history.length > 500) history.length = 500;
+  await chrome.storage.local.set({ focusGuardHistory: history });
 }
 
 // ── Blocking Rules ──
@@ -176,7 +209,7 @@ async function startFocusSession(minutes) {
   await updateBlockingRules(state);
 
   chrome.alarms.create("focusSessionEnd", { when: endTime });
-  chrome.alarms.create("focusSessionTick", { periodInMinutes: 1 / 60 }); // every second-ish for UI
+  chrome.alarms.create("focusSessionTick", { periodInMinutes: 1 / 60 });
 }
 
 async function endFocusSession() {
@@ -201,7 +234,7 @@ async function cancelFocusSession() {
 
 // ── Stats ──
 
-async function recordBlock() {
+async function recordBlock(domain) {
   const state = await getState();
   const today = new Date().toDateString();
   if (state.stats.lastResetDate !== today) {
@@ -211,15 +244,56 @@ async function recordBlock() {
   state.stats.totalBlocked++;
   state.stats.blockedToday++;
   await setState(state);
+
+  // Record in browsing history
+  await addBrowsingHistoryEntry({
+    domain: domain || "unknown",
+    timestamp: Date.now(),
+    wasBlocked: true
+  });
 }
+
+async function recordExerciseCompleted() {
+  const state = await getState();
+  state.stats.exercisesCompleted++;
+  state.stats.totalExerciseReps += 2;
+  await setState(state);
+}
+
+// ── Exercise Challenge ──
+
+function getRandomExercise() {
+  return EXERCISE_CHALLENGES[Math.floor(Math.random() * EXERCISE_CHALLENGES.length)];
+}
+
+// ── Browsing History Tracking ──
+
+function trackNavigation(tabId, url) {
+  if (!url || url.startsWith("chrome") || url.startsWith("about")) return;
+  try {
+    const hostname = new URL(url).hostname.replace(/^www\./, "");
+    addBrowsingHistoryEntry({
+      domain: hostname,
+      timestamp: Date.now(),
+      wasBlocked: false
+    });
+  } catch (e) {
+    // Invalid URL
+  }
+}
+
+// Track tab navigations for browsing history
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === "complete" && tab.url) {
+    trackNavigation(tabId, tab.url);
+  }
+});
 
 // ── Alarm Listener ──
 
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === "focusSessionEnd") {
     await endFocusSession();
-    // Optionally notify
-    // chrome.notifications would need permission
   }
 });
 
@@ -234,7 +308,11 @@ async function handleMessage(msg) {
   switch (msg.type) {
     case "GET_STATE": {
       const state = await getState();
-      return { state, categories: PRESET_CATEGORIES };
+      return {
+        state,
+        categories: PRESET_CATEGORIES,
+        exercises: EXERCISE_CHALLENGES
+      };
     }
 
     case "SET_ENABLED": {
@@ -288,7 +366,23 @@ async function handleMessage(msg) {
     }
 
     case "RECORD_BLOCK": {
-      await recordBlock();
+      await recordBlock(msg.domain);
+      return { ok: true };
+    }
+
+    case "RECORD_EXERCISE": {
+      await recordExerciseCompleted();
+      return { ok: true };
+    }
+
+    case "GET_EXERCISE": {
+      return { exercise: getRandomExercise() };
+    }
+
+    case "SET_EXERCISE_ENABLED": {
+      const state = await getState();
+      state.exerciseChallengeEnabled = msg.enabled;
+      await setState(state);
       return { ok: true };
     }
 
@@ -307,6 +401,57 @@ async function handleMessage(msg) {
       return { ok: true };
     }
 
+    case "GET_BROWSING_HISTORY": {
+      const history = await getBrowsingHistory();
+      return { history };
+    }
+
+    case "CLEAR_BROWSING_HISTORY": {
+      await chrome.storage.local.set({ focusGuardHistory: [] });
+      return { ok: true };
+    }
+
+    case "GET_HISTORY_STATS": {
+      // Query Chrome's history API for blocked domain visits
+      const state = await getState();
+      const domains = getAllBlockedDomains(state);
+      const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const domainVisits = {};
+
+      for (const domain of domains.slice(0, 20)) { // Limit queries
+        try {
+          const results = await chrome.history.search({
+            text: domain,
+            startTime: oneWeekAgo,
+            maxResults: 100
+          });
+          const count = results.filter(r => {
+            try {
+              return new URL(r.url).hostname.replace(/^www\./, "").includes(domain.replace(/^www\./, ""));
+            } catch { return false; }
+          }).length;
+          if (count > 0) domainVisits[domain] = count;
+        } catch (e) {
+          // History API might fail
+        }
+      }
+      return { domainVisits };
+    }
+
+    case "UPDATE_HIDDEN_ELEMENTS": {
+      // Save element hiding settings to sync storage
+      const current = await chrome.storage.sync.get("focusGuardHiddenElements");
+      const settings = current.focusGuardHiddenElements || {};
+      settings[msg.platform] = msg.sections;
+      await chrome.storage.sync.set({ focusGuardHiddenElements: settings });
+      return { ok: true };
+    }
+
+    case "GET_HIDDEN_ELEMENTS": {
+      const result = await chrome.storage.sync.get("focusGuardHiddenElements");
+      return { settings: result.focusGuardHiddenElements || {} };
+    }
+
     default:
       return { error: "Unknown message type" };
   }
@@ -314,10 +459,23 @@ async function handleMessage(msg) {
 
 // ── On Install ──
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
+  // Migrate from local storage to sync storage on update
+  if (details.reason === "update") {
+    const localResult = await chrome.storage.local.get("focusGuardState");
+    if (localResult.focusGuardState) {
+      const syncResult = await chrome.storage.sync.get("focusGuardState");
+      if (!syncResult.focusGuardState) {
+        // Migrate local state to sync
+        await chrome.storage.sync.set({ focusGuardState: localResult.focusGuardState });
+      }
+    }
+  }
+
   const state = await getState();
-  await setState({ ...DEFAULT_STATE, ...state });
-  await updateBlockingRules(state);
+  const merged = { ...DEFAULT_STATE, ...state, stats: { ...DEFAULT_STATE.stats, ...state.stats } };
+  await setState(merged);
+  await updateBlockingRules(merged);
 });
 
 // ── Track blocked navigations for stats ──

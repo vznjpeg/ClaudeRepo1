@@ -20,6 +20,9 @@ async function init() {
   renderCategories();
   renderStats();
   renderSchedule();
+  renderExerciseToggle();
+  renderHideTab();
+  loadHistoryStats();
   checkFocusSession();
   setupTabs();
   setupListeners();
@@ -34,6 +37,14 @@ function setupTabs() {
       document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
       tab.classList.add("active");
       document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active");
+
+      // Refresh hide tab when switching to it
+      if (tab.dataset.tab === "hide") {
+        renderHideTab();
+      }
+      if (tab.dataset.tab === "stats") {
+        loadHistoryStats();
+      }
     });
   });
 }
@@ -83,6 +94,12 @@ function setupListeners() {
 
   document.getElementById("schedEndHour").addEventListener("change", (e) => {
     sendMsg({ type: "UPDATE_SCHEDULE", schedule: { endHour: parseInt(e.target.value) } });
+  });
+
+  // Exercise toggle
+  document.getElementById("exerciseToggle").addEventListener("change", async (e) => {
+    await sendMsg({ type: "SET_EXERCISE_ENABLED", enabled: e.target.checked });
+    currentState.exerciseChallengeEnabled = e.target.checked;
   });
 
   // Settings
@@ -170,6 +187,171 @@ function renderCategories() {
   });
 }
 
+// ── Hide Tab (Element Hider) ──
+
+const PLATFORM_NAMES = {
+  "instagram.com": "Instagram",
+  "facebook.com": "Facebook",
+  "youtube.com": "YouTube",
+  "twitter.com": "Twitter / X",
+  "x.com": "Twitter / X",
+  "linkedin.com": "LinkedIn"
+};
+
+const PLATFORM_ICONS = {
+  "instagram.com": "\u{1F4F7}",
+  "facebook.com": "\u{1F465}",
+  "youtube.com": "\u{1F3AC}",
+  "twitter.com": "\u{1F426}",
+  "x.com": "\u{1F426}",
+  "linkedin.com": "\u{1F4BC}"
+};
+
+// All platform section definitions (mirrors content script)
+const ALL_PLATFORM_SECTIONS = {
+  "instagram.com": {
+    stories: "Stories Tray",
+    reels: "Reels",
+    explore: "Explore Page",
+    suggestions: "Suggested Posts / Users",
+    sidebar: "Right Sidebar"
+  },
+  "facebook.com": {
+    stories: "Stories",
+    reels: "Reels / Short Videos",
+    rightSidebar: "Right Sidebar (Contacts, Ads)",
+    sponsored: "Sponsored Posts",
+    notifications: "Notification Badges",
+    marketplace: "Marketplace"
+  },
+  "youtube.com": {
+    shorts: "Shorts",
+    recommendations: "Recommended / Sidebar Videos",
+    comments: "Comments Section",
+    trending: "Trending",
+    homeFeed: "Home Feed (forces search-only use)",
+    endScreen: "End Screen / Autoplay Cards"
+  },
+  "twitter.com": {
+    trending: "Trending / What's Happening",
+    whoToFollow: "Who to Follow",
+    rightSidebar: "Right Sidebar (Search, Trends)",
+    notifications: "Notification Badges",
+    explore: "Explore Tab"
+  },
+  "x.com": {
+    trending: "Trending / What's Happening",
+    whoToFollow: "Who to Follow",
+    rightSidebar: "Right Sidebar (Search, Trends)",
+    notifications: "Notification Badges",
+    explore: "Explore Tab"
+  },
+  "linkedin.com": {
+    feed: "News Feed",
+    rightSidebar: "Right Sidebar (Ads, News)",
+    notifications: "Notification Badges",
+    messaging: "Messaging Overlay",
+    promoted: "Promoted / Sponsored Posts",
+    myNetwork: "My Network Suggestions"
+  }
+};
+
+async function renderHideTab() {
+  const hiddenRes = await sendMsg({ type: "GET_HIDDEN_ELEMENTS" });
+  const hiddenSettings = hiddenRes.settings || {};
+
+  // Try to detect current tab platform
+  let currentPlatform = null;
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab && tab.url) {
+      const hostname = new URL(tab.url).hostname.replace(/^www\./, "");
+      for (const platform of Object.keys(ALL_PLATFORM_SECTIONS)) {
+        if (hostname.includes(platform)) {
+          currentPlatform = platform;
+          break;
+        }
+      }
+    }
+  } catch (e) {
+    // Can't access tab
+  }
+
+  // Render current site sections
+  const titleEl = document.getElementById("hidePlatformTitle");
+  const listEl = document.getElementById("hideSectionsList");
+
+  if (currentPlatform && ALL_PLATFORM_SECTIONS[currentPlatform]) {
+    const platformName = PLATFORM_NAMES[currentPlatform] || currentPlatform;
+    const icon = PLATFORM_ICONS[currentPlatform] || "";
+    titleEl.textContent = `${icon} ${platformName} — Elements`;
+
+    const sections = ALL_PLATFORM_SECTIONS[currentPlatform];
+    const platformHidden = hiddenSettings[currentPlatform] || {};
+
+    listEl.innerHTML = Object.entries(sections).map(([key, label]) => {
+      const isHidden = platformHidden[key] === true;
+      return `
+        <div class="hide-section-item ${isHidden ? "active" : ""}" data-platform="${currentPlatform}" data-section="${key}">
+          <span class="hide-section-label">${escapeHtml(label)}</span>
+          <div class="hide-section-toggle">
+            <label class="aqua-toggle small-toggle">
+              <input type="checkbox" ${isHidden ? "checked" : ""} data-platform="${currentPlatform}" data-section="${key}">
+              <span class="toggle-track">
+                <span class="toggle-thumb"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    listEl.querySelectorAll("input[type=checkbox]").forEach(cb => {
+      cb.addEventListener("change", async (e) => {
+        const platform = e.target.dataset.platform;
+        const section = e.target.dataset.section;
+        const current = hiddenSettings[platform] || {};
+        current[section] = e.target.checked;
+        await sendMsg({ type: "UPDATE_HIDDEN_ELEMENTS", platform, sections: current });
+        hiddenSettings[platform] = current;
+
+        // Notify content script to refresh
+        try {
+          const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+          if (tab) chrome.tabs.sendMessage(tab.id, { type: "REFRESH_HIDING" });
+        } catch (e) { /* ignore */ }
+      });
+    });
+  } else {
+    titleEl.textContent = "Current Site";
+    listEl.innerHTML = '<div class="empty-state">Visit Instagram, Facebook, YouTube, Twitter/X, or LinkedIn to configure element hiding.</div>';
+  }
+
+  // Render all platforms quick config
+  const quickList = document.getElementById("platformQuickList");
+  quickList.innerHTML = Object.entries(ALL_PLATFORM_SECTIONS).map(([platform, sections]) => {
+    const platformName = PLATFORM_NAMES[platform] || platform;
+    const icon = PLATFORM_ICONS[platform] || "";
+    const platformHidden = hiddenSettings[platform] || {};
+    const hiddenCount = Object.values(platformHidden).filter(v => v).length;
+    const totalCount = Object.keys(sections).length;
+    return `
+      <div class="platform-quick-item" data-platform="${platform}">
+        <span class="platform-quick-icon">${icon}</span>
+        <span class="platform-quick-name">${escapeHtml(platformName)}</span>
+        <span class="platform-quick-count">${hiddenCount}/${totalCount} hidden</span>
+      </div>
+    `;
+  }).join("");
+}
+
+// ── Exercise Toggle ──
+
+function renderExerciseToggle() {
+  const toggle = document.getElementById("exerciseToggle");
+  toggle.checked = currentState.exerciseChallengeEnabled !== false;
+}
+
 // ── Focus Session ──
 
 async function startFocus(minutes) {
@@ -251,6 +433,35 @@ function renderStats() {
     hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   document.getElementById("blockedCount").textContent = s.blockedToday;
+
+  // Exercise stats
+  document.getElementById("statExercises").textContent = s.exercisesCompleted || 0;
+  document.getElementById("statReps").textContent = s.totalExerciseReps || 0;
+}
+
+// ── Browsing History Stats ──
+
+async function loadHistoryStats() {
+  const container = document.getElementById("historyStats");
+  try {
+    const res = await sendMsg({ type: "GET_HISTORY_STATS" });
+    const visits = res.domainVisits || {};
+    const entries = Object.entries(visits).sort((a, b) => b[1] - a[1]);
+
+    if (entries.length === 0) {
+      container.innerHTML = '<div class="empty-state">No blocked site visits found in history.</div>';
+      return;
+    }
+
+    container.innerHTML = entries.slice(0, 10).map(([domain, count]) => `
+      <div class="history-stat-item">
+        <span class="history-domain">${escapeHtml(domain)}</span>
+        <span class="history-count">${count} visits</span>
+      </div>
+    `).join("");
+  } catch (e) {
+    container.innerHTML = '<div class="empty-state">Unable to load history stats.</div>';
+  }
 }
 
 // ── Schedule ──
