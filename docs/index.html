@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MuscleTick — Privacy Policy</title>
+  <style>
+    :root {
+      --cream: #f5f0e1;
+      --cream-dark: #e8e0cc;
+      --black: #1a1a1a;
+      --white: #fffef5;
+      --font: "Geneva", "Charcoal", "Lucida Grande", system-ui, sans-serif;
+      --mono: "Monaco", "Menlo", "Courier New", monospace;
+      --border: 2px solid var(--black);
+      --shadow: 6px 6px 0 var(--black);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--black);
+      background: var(--cream);
+      background-image:
+        repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0,0,0,0.025) 1px, rgba(0,0,0,0.025) 2px),
+        repeating-linear-gradient(90deg, transparent 0px, transparent 1px, rgba(0,0,0,0.025) 1px, rgba(0,0,0,0.025) 2px);
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+    }
+
+    /* ── Header ── */
+
+    .site-header {
+      max-width: 760px;
+      margin: 0 auto 36px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .logo-mark {
+      width: 56px;
+      height: 56px;
+      border: var(--border);
+      box-shadow: 3px 3px 0 var(--black);
+      background: var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .site-name {
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      line-height: 1.1;
+    }
+
+    .site-tagline {
+      font-size: 12px;
+      color: #777;
+      letter-spacing: 0.5px;
+      margin-top: 3px;
+    }
+
+    /* ── Main Window ── */
+
+    .window {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--white);
+      border: var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .window-titlebar {
+      display: flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-bottom: var(--border);
+      background: var(--white);
+      background-image: repeating-linear-gradient(
+        0deg, transparent 0px, transparent 2px,
+        var(--cream-dark) 2px, var(--cream-dark) 3px
+      );
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 6px;
+      margin-right: 14px;
+    }
+
+    .dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1px solid var(--black);
+      background: var(--white);
+    }
+
+    .dot:first-child { background: var(--black); }
+
+    .window-titlebar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Content ── */
+
+    .window-body {
+      padding: 36px 48px 48px;
+    }
+
+    .effective-date {
+      font-size: 11px;
+      color: #888;
+      font-family: var(--mono);
+      margin-bottom: 28px;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed #ccc;
+      letter-spacing: 0.5px;
+    }
+
+    .intro {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #333;
+      margin-bottom: 36px;
+      padding: 16px 18px;
+      background: var(--cream);
+      border: var(--border);
+      border-left: 6px solid var(--black);
+    }
+
+    h2 {
+      font-size: 14px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 36px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--black);
+    }
+
+    p {
+      color: #333;
+      margin-bottom: 14px;
+    }
+
+    ul {
+      padding-left: 0;
+      margin-bottom: 14px;
+      list-style: none;
+    }
+
+    ul li {
+      padding: 6px 10px 6px 24px;
+      position: relative;
+      color: #333;
+      border-bottom: 1px dotted #ddd;
+    }
+
+    ul li:last-child { border-bottom: none; }
+
+    ul li::before {
+      content: "▸";
+      position: absolute;
+      left: 6px;
+      color: var(--black);
+      font-size: 12px;
+      top: 7px;
+    }
+
+    .callout {
+      background: var(--cream);
+      border: var(--border);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .callout strong {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px dashed var(--black);
+    }
+
+    .callout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 580px) {
+      .callout-grid { grid-template-columns: 1fr; }
+      .window-body { padding: 24px 20px 36px; }
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 12px;
+    }
+
+    .data-table th {
+      background: var(--black);
+      color: var(--white);
+      padding: 7px 12px;
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .data-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--cream-dark);
+      vertical-align: top;
+      color: #333;
+    }
+
+    .data-table tr:nth-child(even) td {
+      background: var(--cream);
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: bold;
+      font-family: var(--mono);
+      padding: 2px 6px;
+      border: 1px solid var(--black);
+      background: var(--cream-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tag-local { background: #e8f5e9; }
+    .tag-sync  { background: #e3f2fd; }
+    .tag-never { background: #f9fbe7; }
+
+    .contact-box {
+      margin-top: 36px;
+      padding: 16px;
+      background: var(--cream);
+      border: var(--border);
+      text-align: center;
+    }
+
+    .contact-box p { margin: 0; font-size: 13px; }
+    .contact-box a { color: var(--black); font-weight: bold; text-underline-offset: 3px; }
+
+    .window-footer {
+      height: 8px;
+      border-top: 1px solid var(--black);
+      background: repeating-linear-gradient(
+        90deg,
+        var(--black) 0px, var(--black) 1px,
+        var(--white) 1px, var(--white) 3px
+      );
+      opacity: 0.2;
+    }
+
+    .page-footer {
+      max-width: 760px;
+      margin: 24px auto 0;
+      text-align: center;
+      font-size: 10px;
+      color: #aaa;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="logo-mark">&#x1F4AA;</div>
+    <div>
+      <div class="site-name">MuscleTick</div>
+      <div class="site-tagline">Chrome Extension &mdash; Productivity with a physical cost</div>
+    </div>
+  </header>
+
+  <main class="window">
+    <div class="window-titlebar">
+      <div class="window-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <span class="window-titlebar-title">Privacy Policy</span>
+    </div>
+
+    <div class="window-body">
+
+      <div class="effective-date">Last updated: February 20, 2026 &nbsp;/&nbsp; Version 2.0.0</div>
+
+      <div class="intro">
+        MuscleTick is a Chrome extension that helps you stay focused by blocking distracting websites, hiding attention-grabbing page elements, and requiring a small bodyweight exercise before you can access a site you&#8217;ve banned yourself from. This policy explains exactly what data we collect, how it stays on your device, and what we never do with it.
+      </div>
+
+      <h2>1. Who We Are</h2>
+      <p>MuscleTick is an open-source Chrome browser extension. It operates entirely within your browser. There is no company server, no user accounts, no analytics platform, and no backend infrastructure of any kind.</p>
+
+      <h2>2. Data We Collect &amp; Where It Lives</h2>
+      <p>MuscleTick collects only what is necessary to deliver its features. The table below describes every category of data the extension touches.</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>What It Contains</th>
+            <th>Where Stored</th>
+            <th>Shared Externally?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Block list &amp; settings</strong></td>
+            <td>Domains you have blocked, enabled preset categories, schedule configuration, exercise challenge toggle, element hiding preferences per platform</td>
+            <td><span class="tag tag-sync">chrome.storage.sync</span></td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><strong>Focus session state</strong></td>
+            <td>Active session end time and duration</td>
+            <td><span class="tag tag-sync">chrome.storage.sync</span></td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><strong>Statistics</strong></td>
+            <td>Count of sites blocked today &amp; total, focus sessions completed, total focus minutes, exercises completed, total reps</td>
+            <td><span class="tag tag-sync">chrome.storage.sync</span></td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><strong>Internal browsing history</strong></td>
+            <td>Domain name and timestamp of each tab navigation, flagged if the visit was blocked. Maximum 500 entries, rolling.</td>
+            <td><span class="tag tag-local">chrome.storage.local</span></td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td><strong>Chrome history read</strong></td>
+            <td>The extension queries <code>chrome.history</code> to count visits to blocked domains in the last 7 days, shown in the Stats tab. This data is not copied, stored, or transmitted.</td>
+            <td><span class="tag tag-never">Not stored</span></td>
+            <td>No</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout-grid">
+        <div class="callout">
+          <strong>chrome.storage.sync</strong>
+          Synced via your Google account to all Chrome browsers where you are signed in. Google&#8217;s own privacy policy governs this sync channel. MuscleTick has no visibility into the sync process and receives no copies of your data.
+        </div>
+        <div class="callout">
+          <strong>chrome.storage.local</strong>
+          Stored only on this device, inside Chrome&#8217;s sandboxed extension storage. Never leaves the device except when you explicitly export a backup through the Options page.
+        </div>
+      </div>
+
+      <h2>3. Permissions Explained</h2>
+      <p>Chrome displays a list of permissions when you install MuscleTick. Here is exactly why each is required:</p>
+      <ul>
+        <li><strong>storage</strong> &mdash; Read and write your block list, settings, and statistics to <code>chrome.storage.sync</code> and <code>chrome.storage.local</code>.</li>
+        <li><strong>declarativeNetRequest / declarativeNetRequestFeedback</strong> &mdash; Redirect navigation to blocked domains to the exercise challenge page. The redirect happens entirely in the browser; no data is sent to any server.</li>
+        <li><strong>alarms</strong> &mdash; End timed focus sessions automatically after the chosen duration.</li>
+        <li><strong>tabs</strong> &mdash; Detect which platform you are currently visiting so the Hide tab shows the correct element controls, and track navigations for the internal browsing history feature.</li>
+        <li><strong>history</strong> &mdash; Query Chrome&#8217;s built-in history to count how many times you have visited your blocked domains in the past 7 days. Displayed only to you; never stored or transmitted.</li>
+        <li><strong>identity</strong> &mdash; Reserved for potential future features requiring Google account verification for sync. Not actively used in the current release.</li>
+        <li><strong>host_permissions (&lt;all_urls&gt;)</strong> &mdash; Required so content scripts can run on supported platforms (Instagram, Facebook, YouTube, Twitter/X, LinkedIn) to hide distracting page elements.</li>
+      </ul>
+
+      <h2>4. Content Scripts &amp; Element Hiding</h2>
+      <p>When you visit Instagram, Facebook, YouTube, Twitter/X, or LinkedIn, MuscleTick injects a content script that reads your element-hiding preferences and adds CSS classes to hide the sections you have toggled off (e.g. Stories, Reels, Shorts, Trending, Sponsored Posts).</p>
+      <p>The content script <strong>does not read page content</strong>, does not capture text or images from those pages, does not exfiltrate your social media data, and does not communicate with any external server. It only modifies the visual presentation of the page inside your browser.</p>
+
+      <h2>5. Exercise Challenges</h2>
+      <p>When you navigate to a blocked site, MuscleTick presents a challenge page asking you to complete 2 reps of a randomly selected bodyweight exercise before unlocking navigation. Rep completion is confirmed by a button tap only. No biometric data, camera access, or movement sensor data is used or requested. The exercise type and rep count are stored locally as part of your aggregate statistics only.</p>
+
+      <h2>6. Data We Never Collect</h2>
+      <div class="callout-grid">
+        <div class="callout">
+          <strong>We never collect</strong>
+          <ul style="margin:0;padding:0;">
+            <li>Your name, email, or any identity information</li>
+            <li>Passwords or form input from any site</li>
+            <li>Full URLs or page content of sites you visit</li>
+            <li>Photos, camera, or microphone data</li>
+            <li>IP addresses or location data</li>
+          </ul>
+        </div>
+        <div class="callout">
+          <strong>We never do</strong>
+          <ul style="margin:0;padding:0;">
+            <li>Send data to a remote server or API</li>
+            <li>Use third-party analytics or tracking SDKs</li>
+            <li>Sell, rent, or share your data with any party</li>
+            <li>Display advertisements</li>
+            <li>Run background crypto-mining or unrelated processing</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>7. Cross-Device Sync via Google</h2>
+      <p>MuscleTick uses <code>chrome.storage.sync</code> to keep your settings consistent across devices. This works through Chrome&#8217;s built-in sync infrastructure, tied to your Google account. MuscleTick does not interact with Google&#8217;s servers directly &mdash; Chrome handles all sync transport. Data synced is limited to your block list, categories, schedule, element-hiding preferences, exercise toggle, and aggregate statistics. Your internal browsing history is stored only in <code>chrome.storage.local</code> and is <strong>never synced</strong>.</p>
+      <p>For details on how Google handles synced extension storage, see <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google&#8217;s Privacy Policy</a>.</p>
+
+      <h2>8. Data Retention &amp; Deletion</h2>
+      <p>All data persists until you explicitly remove it. You have full control:</p>
+      <ul>
+        <li>Popup &rarr; Stats tab &rarr; Reset Statistics to clear all aggregate counts at any time.</li>
+        <li>Options &rarr; Browsing History &rarr; Clear to wipe all internal history entries from this device.</li>
+        <li>Options &rarr; Reset Everything to erase all data from both sync and local storage across all signed-in devices.</li>
+        <li>Uninstalling MuscleTick removes all <code>chrome.storage.local</code> data immediately. Chrome also removes <code>chrome.storage.sync</code> data on uninstall.</li>
+      </ul>
+
+      <h2>9. Third-Party Services</h2>
+      <p>The blocked-site interstitial page displays a random photograph sourced from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a> via a direct <code>&lt;img&gt;</code> tag. When your browser loads the image, a standard HTTP request is made to Unsplash&#8217;s CDN. <a href="https://unsplash.com/privacy" target="_blank" rel="noopener">Unsplash&#8217;s Privacy Policy</a> applies to that request. No query parameters, user identifiers, or extension data are included.</p>
+      <p>Beyond these image loads, MuscleTick makes no outbound network requests of any kind.</p>
+
+      <h2>10. Children&#8217;s Privacy</h2>
+      <p>MuscleTick does not knowingly collect personal information from children under the age of 13 (or the applicable age of digital consent in your jurisdiction). Because the extension collects no personal information from any user, it presents no particular risk in this regard. If you have concerns, please open an issue on GitHub.</p>
+
+      <h2>11. Changes to This Policy</h2>
+      <p>If we make material changes to this privacy policy, we will update the &#8220;Last updated&#8221; date at the top of this page and increment the version number. For significant changes, we will note them in the extension&#8217;s release notes on GitHub.</p>
+
+      <h2>12. Open Source</h2>
+      <p>MuscleTick is open source. You can inspect every line of code that runs in your browser at any time. The source code is the authoritative record of extension behavior; this policy is a plain-language summary.</p>
+      <p><a href="https://github.com/vznjpeg/MuscleTick" target="_blank" rel="noopener">github.com/vznjpeg/MuscleTick</a></p>
+
+      <div class="contact-box">
+        <p>Questions about this privacy policy?<br>
+        Open an issue on <a href="https://github.com/vznjpeg/MuscleTick/issues" target="_blank" rel="noopener">GitHub</a> and we will respond there.</p>
+      </div>
+
+    </div>
+
+    <div class="window-footer"></div>
+  </main>
+
+  <footer class="page-footer">
+    MuscleTick &mdash; Privacy Policy &mdash; v2.0.0 &mdash; &copy; 2026
+  </footer>
+
+</body>
+</html>
