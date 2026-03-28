@@ -23,7 +23,6 @@
       min-height: 100vh;
       font-family: var(--font);
       background: var(--cream);
-      /* Classic Mac desktop pattern */
       background-image:
         repeating-linear-gradient(
           0deg,
@@ -63,7 +62,6 @@
       padding: 6px 10px;
       border-bottom: var(--border);
       background: var(--white);
-      /* Classic horizontal lines pattern in titlebar */
       background-image:
         repeating-linear-gradient(
           0deg,
@@ -114,7 +112,6 @@
       overflow: hidden;
       position: relative;
       background: var(--cream-dark);
-      /* Dithered loading pattern */
       background-image:
         repeating-linear-gradient(
           45deg,
@@ -128,7 +125,6 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      /* Retro halftone feel */
       filter: contrast(1.1) saturate(0.3);
     }
 
@@ -239,6 +235,11 @@
       color: var(--black);
     }
 
+    .mac-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
     .timer-info {
       margin-top: 14px;
       font-size: 11px;
@@ -267,6 +268,155 @@
       color: #999;
       font-family: "Monaco", monospace;
       letter-spacing: 1px;
+    }
+
+    /* ── Exercise Challenge ─────────────────────────── */
+
+    .exercise-challenge {
+      margin-top: 16px;
+      background: var(--cream);
+      border: var(--border);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .exercise-header {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--black);
+    }
+
+    .exercise-emoji {
+      font-size: 48px;
+      margin-bottom: 8px;
+      display: block;
+      filter: none;
+    }
+
+    .exercise-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--black);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .exercise-quantity {
+      font-size: 36px;
+      font-weight: bold;
+      font-family: "Monaco", monospace;
+      color: var(--black);
+      margin-bottom: 4px;
+    }
+
+    .exercise-instruction {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 14px;
+      font-style: italic;
+    }
+
+    .exercise-timer {
+      font-size: 28px;
+      font-weight: bold;
+      font-family: "Monaco", monospace;
+      color: var(--black);
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+    }
+
+    .exercise-progress-bar {
+      width: 100%;
+      height: 12px;
+      border: var(--border);
+      background: var(--white);
+      margin-bottom: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exercise-progress-fill {
+      height: 100%;
+      background: var(--black);
+      width: 0%;
+      transition: width 1s linear;
+    }
+
+    .exercise-status {
+      font-size: 10px;
+      font-weight: bold;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .exercise-complete {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .exercise-complete.show {
+      display: block;
+    }
+
+    .exercise-complete-text {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--black);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    /* ── Rep counter buttons ──────────────────── */
+
+    .rep-counter {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .rep-btn {
+      width: 50px;
+      height: 50px;
+      border: var(--border);
+      background: var(--white);
+      font-family: var(--font);
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 var(--black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.05s;
+    }
+
+    .rep-btn:active {
+      background: var(--black);
+      color: var(--white);
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+
+    .rep-btn.done {
+      background: var(--black);
+      color: var(--white);
+      box-shadow: none;
+    }
+
+    .rep-count-display {
+      font-size: 24px;
+      font-weight: bold;
+      font-family: "Monaco", monospace;
     }
 
     /* ── Dither border decoration at bottom ───────── */
@@ -316,7 +466,32 @@
 
         <div class="divider"></div>
 
-        <div class="actions">
+        <!-- Exercise Challenge Section -->
+        <div class="exercise-challenge" id="exerciseChallenge">
+          <div class="exercise-header">Exercise Challenge Required</div>
+          <div class="exercise-emoji" id="exerciseEmoji"></div>
+          <div class="exercise-name" id="exerciseName"></div>
+          <div class="exercise-quantity"><span id="exerciseQty">2</span>x</div>
+          <div class="exercise-instruction" id="exerciseInstruction"></div>
+
+          <div class="exercise-status" id="exerciseStatus">Tap each rep after completing it</div>
+
+          <div class="rep-counter" id="repCounter">
+            <button class="rep-btn" id="rep1" data-rep="1">1</button>
+            <button class="rep-btn" id="rep2" data-rep="2">2</button>
+          </div>
+
+          <div class="exercise-progress-bar">
+            <div class="exercise-progress-fill" id="progressFill"></div>
+          </div>
+
+          <div class="exercise-complete" id="exerciseComplete">
+            <div class="exercise-complete-text">Exercise Complete! Nice work.</div>
+          </div>
+        </div>
+
+        <!-- Actions (hidden until exercise is complete when challenge is enabled) -->
+        <div class="actions" id="actionButtons" style="margin-top: 16px;">
           <a class="mac-btn mac-btn-primary" id="goBackBtn" href="#">Go Back</a>
           <a class="mac-btn" id="goHomeBtn" href="https://www.google.com">Search Instead</a>
         </div>
@@ -434,7 +609,7 @@
         sub: "Every block is a tiny win. Stack enough and you've got a great day."
       },
       {
-        caption: "Even this hamster has more self-control than— wait, no, you do!",
+        caption: "Even this hamster has more self-control than\u2014 wait, no, you do!",
         sub: "You literally built a system to keep yourself on track. That's elite."
       },
       {
@@ -535,7 +710,108 @@
     });
 
     // Record the block
-    chrome.runtime.sendMessage({ type: "RECORD_BLOCK" });
+    chrome.runtime.sendMessage({ type: "RECORD_BLOCK", domain });
+
+    // ── Exercise Challenge ──
+
+    let exerciseCompleted = false;
+    let repsCompleted = 0;
+    const REQUIRED_REPS = 2;
+
+    function initExerciseChallenge() {
+      chrome.runtime.sendMessage({ type: "GET_STATE" }, (res) => {
+        if (!res || !res.state) return;
+
+        const challengeEnabled = res.state.exerciseChallengeEnabled !== false;
+        const challengeEl = document.getElementById("exerciseChallenge");
+        const actionBtns = document.getElementById("actionButtons");
+
+        if (!challengeEnabled) {
+          // No exercise challenge - show buttons directly
+          challengeEl.classList.add("hidden");
+          return;
+        }
+
+        // Get a random exercise
+        chrome.runtime.sendMessage({ type: "GET_EXERCISE" }, (exRes) => {
+          if (!exRes || !exRes.exercise) return;
+
+          const exercise = exRes.exercise;
+
+          document.getElementById("exerciseEmoji").textContent = exercise.emoji;
+          document.getElementById("exerciseName").textContent = exercise.name;
+          document.getElementById("exerciseQty").textContent = exercise.quantity;
+          document.getElementById("exerciseInstruction").textContent = exercise.instruction;
+
+          // Hide action buttons until exercise is complete
+          const goBackBtn = document.getElementById("goBackBtn");
+          const goHomeBtn = document.getElementById("goHomeBtn");
+          goBackBtn.style.pointerEvents = "none";
+          goBackBtn.style.opacity = "0.3";
+          goHomeBtn.style.pointerEvents = "none";
+          goHomeBtn.style.opacity = "0.3";
+
+          // Setup rep buttons
+          setupRepButtons();
+        });
+      });
+    }
+
+    function setupRepButtons() {
+      const rep1 = document.getElementById("rep1");
+      const rep2 = document.getElementById("rep2");
+      const progressFill = document.getElementById("progressFill");
+      const statusEl = document.getElementById("exerciseStatus");
+
+      rep1.addEventListener("click", () => {
+        if (rep1.classList.contains("done")) return;
+        rep1.classList.add("done");
+        rep1.textContent = "\u2713";
+        repsCompleted++;
+        progressFill.style.width = `${(repsCompleted / REQUIRED_REPS) * 100}%`;
+        statusEl.textContent = `${repsCompleted}/${REQUIRED_REPS} reps completed`;
+        checkExerciseComplete();
+      });
+
+      rep2.addEventListener("click", () => {
+        if (rep2.classList.contains("done")) return;
+        if (repsCompleted < 1) {
+          statusEl.textContent = "Complete rep 1 first!";
+          return;
+        }
+        rep2.classList.add("done");
+        rep2.textContent = "\u2713";
+        repsCompleted++;
+        progressFill.style.width = `${(repsCompleted / REQUIRED_REPS) * 100}%`;
+        statusEl.textContent = `${repsCompleted}/${REQUIRED_REPS} reps completed`;
+        checkExerciseComplete();
+      });
+    }
+
+    function checkExerciseComplete() {
+      if (repsCompleted >= REQUIRED_REPS) {
+        exerciseCompleted = true;
+
+        const statusEl = document.getElementById("exerciseStatus");
+        statusEl.textContent = "All reps completed!";
+
+        const completeEl = document.getElementById("exerciseComplete");
+        completeEl.classList.add("show");
+
+        // Unlock the navigation buttons
+        const goBackBtn = document.getElementById("goBackBtn");
+        const goHomeBtn = document.getElementById("goHomeBtn");
+        goBackBtn.style.pointerEvents = "";
+        goBackBtn.style.opacity = "";
+        goHomeBtn.style.pointerEvents = "";
+        goHomeBtn.style.opacity = "";
+
+        // Record the exercise completion
+        chrome.runtime.sendMessage({ type: "RECORD_EXERCISE" });
+      }
+    }
+
+    initExerciseChallenge();
   </script>
 </body>
 </html>

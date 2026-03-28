@@ -206,6 +206,74 @@
 
     .hidden { display: none !important; }
 
+    /* Sync status */
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: var(--white);
+      border: var(--border-thin);
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--black);
+    }
+
+    .sync-dot.active {
+      background: #2d8a4e;
+    }
+
+    /* History list */
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      margin-top: 8px;
+    }
+
+    .history-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 8px;
+      background: var(--white);
+      border: var(--border-thin);
+      font-size: 10px;
+    }
+
+    .history-entry:nth-child(even) {
+      background: var(--cream);
+    }
+
+    .history-domain {
+      font-family: "Monaco", monospace;
+      font-weight: bold;
+      font-size: 9px;
+    }
+
+    .history-time {
+      font-size: 9px;
+      color: #888;
+    }
+
+    .history-blocked {
+      font-size: 8px;
+      font-weight: bold;
+      color: var(--black);
+      background: var(--cream-dark);
+      border: var(--border-thin);
+      padding: 1px 4px;
+      text-transform: uppercase;
+    }
+
     /* Footer dither */
     .window-footer {
       height: 6px;
@@ -232,6 +300,17 @@
     </div>
     <div class="window-body">
 
+      <!-- Sync Status -->
+      <div class="section">
+        <div class="section-header">Sync Status</div>
+        <div class="sync-status">
+          <div class="sync-dot active" id="syncDot"></div>
+          <span id="syncStatusText">Settings sync via Google account (chrome.storage.sync)</span>
+        </div>
+        <div class="option-desc">Your block list, categories, element hiding preferences, and exercise settings automatically sync across all Chrome browsers signed into the same Google account.</div>
+      </div>
+
+      <!-- Data Management -->
       <div class="section">
         <div class="section-header">Data Management</div>
         <div class="option-row">
@@ -254,26 +333,49 @@
         <div class="status-msg" id="importStatus"></div>
       </div>
 
+      <!-- Browsing History -->
+      <div class="section">
+        <div class="section-header">Browsing History</div>
+        <div class="option-row">
+          <div>
+            <div class="option-label">Recent Activity</div>
+            <div class="option-desc">Sites visited and blocks recorded by FocusGuard.</div>
+          </div>
+          <button class="mac-btn" id="loadHistoryBtn">Load</button>
+        </div>
+        <div class="history-list hidden" id="historyList">
+          <div style="text-align:center; color:#999; padding:8px; font-style:italic;">Loading...</div>
+        </div>
+        <div class="option-row">
+          <div>
+            <div class="option-label">Clear FocusGuard History</div>
+            <div class="option-desc">Remove all stored browsing activity data.</div>
+          </div>
+          <button class="mac-btn btn-danger" id="clearHistoryBtn">Clear</button>
+        </div>
+      </div>
+
+      <!-- Reset -->
       <div class="section">
         <div class="section-header">Reset</div>
         <div class="option-row">
           <div>
             <div class="option-label">Reset Statistics</div>
-            <div class="option-desc">Clear all tracked stats. Block list is kept.</div>
+            <div class="option-desc">Clear all tracked stats (including exercise counts). Block list is kept.</div>
           </div>
           <button class="mac-btn" id="resetStatsBtn">Reset Stats</button>
         </div>
         <div class="option-row">
           <div>
             <div class="option-label">Reset Everything</div>
-            <div class="option-desc">Remove all blocked sites, categories, and stats.</div>
+            <div class="option-desc">Remove all blocked sites, categories, element hiding prefs, and stats.</div>
           </div>
           <button class="mac-btn btn-danger" id="resetAllBtn">Reset All</button>
         </div>
       </div>
 
       <div class="about">
-        <strong>FocusGuard</strong> v1.0.0 — Stay focused, stay sharp.
+        <strong>FocusGuard</strong> v2.0.0 — Stay focused, stay sharp. Now with exercise challenges & cross-device sync.
       </div>
     </div>
     <div class="window-footer"></div>
@@ -316,6 +418,43 @@
       }
     });
 
+    // Load browsing history
+    document.getElementById("loadHistoryBtn").addEventListener("click", async () => {
+      const container = document.getElementById("historyList");
+      container.classList.remove("hidden");
+
+      const res = await sendMsg({ type: "GET_BROWSING_HISTORY" });
+      const history = res.history || [];
+
+      if (history.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#999; padding:8px; font-style:italic;">No browsing history recorded yet.</div>';
+        return;
+      }
+
+      container.innerHTML = history.slice(0, 100).map(entry => {
+        const time = new Date(entry.timestamp);
+        const timeStr = time.toLocaleDateString() + " " + time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        const blockedTag = entry.wasBlocked ? '<span class="history-blocked">Blocked</span>' : '';
+        return `
+          <div class="history-entry">
+            <span class="history-domain">${escapeHtml(entry.domain)}</span>
+            ${blockedTag}
+            <span class="history-time">${timeStr}</span>
+          </div>
+        `;
+      }).join("");
+    });
+
+    // Clear browsing history
+    document.getElementById("clearHistoryBtn").addEventListener("click", async () => {
+      if (confirm("Clear all FocusGuard browsing history? This cannot be undone.")) {
+        await sendMsg({ type: "CLEAR_BROWSING_HISTORY" });
+        const container = document.getElementById("historyList");
+        container.innerHTML = '<div style="text-align:center; color:#999; padding:8px; font-style:italic;">History cleared.</div>';
+        alert("Browsing history cleared.");
+      }
+    });
+
     // Reset stats
     document.getElementById("resetStatsBtn").addEventListener("click", async () => {
       if (confirm("Reset all statistics? This cannot be undone.")) {
@@ -326,12 +465,19 @@
 
     // Reset all
     document.getElementById("resetAllBtn").addEventListener("click", async () => {
-      if (confirm("Remove ALL data? This will clear your block list, categories, and stats.")) {
+      if (confirm("Remove ALL data? This will clear your block list, categories, element hiding settings, and stats across all synced devices.")) {
+        await chrome.storage.sync.clear();
         await chrome.storage.local.clear();
         alert("All data cleared. Reloading...");
         location.reload();
       }
     });
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
   </script>
 </body>
 </html>
